@@ -1,1 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CMU Event Compass – Home Feed</title>
+  <style>
+    :root {
+      --color-primary: #a31921; /* CMU red */
+      --color-primary-dark: #801119;
+      --color-primary-light: #f7e4e6;
+      --color-bg: #f5f5f7;
+      --color-surface: #ffffff;
+      --color-border: #e1e1e6;
+      --color-text-main: #111111;
+      --color-text-muted: #6b6b76;
+      --color-success: #1b8f4d;
+      --color-warning: #e0a100;
+      --radius-card: 12px;
+      --shadow-1: 0 1px 3px rgba(0, 0, 0, 0.08);
+      --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.14);
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 24px;
+      --space-6: 32px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+      background: var(--color-bg);
+      color: var(--color-text-main);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .app-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* HEADER */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow-1);
+    }
+
+    .app-header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--space-2) var(--space-4);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      white-space: nowrap;
+    }
+
+    .brand-logo {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: var(--color-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .brand-title {
+      font-weight: 600;
+      font-size: 18px;
+    }
+
+    .header-search {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+    }
+
+    .search-input {
+      width: 100%;
+      max-width: 520px;
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+      border-radius: 999px;
+      background: #f0f0f4;
+      border: 1px solid transparent;
+      transition: border 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+
+    .search-input:focus-within {
+      background: #ffffff;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 1px rgba(163, 25, 33, 0.2);
+    }
+
+    .search-input-icon {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      border: 2px solid var(--color-text-muted);
+      position: relative;
+    }
+
+    .search-input-icon::after {
+      content: "";
+      position: absolute;
+      width: 8px;
+      height: 2px;
+      border-radius: 999px;
+      background: var(--color-text-muted);
+      transform: rotate(45deg);
+      right: -5px;
+      bottom: -1px;
+    }
+
+    .search-input input {
+      border: none;
+      outline: none;
+      background: transparent;
+      flex: 1;
+      font-size: 14px;
+      color: var(--color-text-main);
+    }
+
+    .search-input input::placeholder {
+      color: var(--color-text-muted);
+    }
+
+    .header-user {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      white-space: nowrap;
+    }
+
+    .icon-button {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      border: none;
+      background: #f0f0f4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      background: #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: #555;
+    }
+
+    @media (max-width: 768px) {
+      .app-header-inner {
+        padding-inline: var(--space-3);
+      }
+
+      .header-search {
+        display: none;
+      }
+
+      .brand-title {
+        font-size: 16px;
+      }
+    }
+
+    /* MAIN LAYOUT */
+    .app-main {
+      flex: 1;
+      padding: var(--space-4) var(--space-4) var(--space-5);
+    }
+
+    .app-main-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 3fr 1.1fr;
+      gap: var(--space-5);
+    }
+
+    @media (max-width: 960px) {
+      .app-main {
+        padding-inline: var(--space-3);
+        padding-top: var(--space-3);
+      }
+
+      .app-main-inner {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* PAGE HEADER + FILTERS */
+    .page-header {
+      margin-bottom: var(--space-4);
+    }
+
+    .page-title-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-2);
+      margin-bottom: var(--space-2);
+    }
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 600;
+    }
+
+    .page-subtitle {
+      font-size: 14px;
+      color: var(--color-text-muted);
+    }
+
+    @media (max-width: 768px) {
+      .page-title {
+        font-size: 22px;
+      }
+    }
+
+    .filters-shell {
+      background: var(--color-surface);
+      padding: var(--space-3);
+      border-radius: var(--radius-card);
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow-1);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .filters-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      align-items: center;
+    }
+
+    .filters-row-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .select-input {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 32px 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--color-border);
+      background: #fafafa;
+      font-size: 13px;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .select-input::after {
+      content: "▾";
+      position: absolute;
+      right: 10px;
+      font-size: 10px;
+      color: var(--color-text-muted);
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      border: 1px solid #ddd;
+      background: #fafafa;
+      color: var(--color-text-main);
+      cursor: pointer;
+      transition: background 0.15s ease, border 0.15s ease, color 0.15s ease;
+    }
+
+    .chip:hover {
+      background: #f0f0f4;
+    }
+
+    .chip.chip--active {
+      background: var(--color-primary-light);
+      color: var(--color-primary);
+      border-color: rgba(163, 25, 33, 0.4);
+      font-weight: 500;
+    }
+
+    .chip-tag {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      background: #f4f4f7;
+      color: var(--color-text-muted);
+    }
+
+    .chip-tag.tag-hackathon {
+      background: #e3f1ff;
+      color: #145c9e;
+    }
+
+    .chip-tag.tag-talk {
+      background: #dff5f1;
+      color: #0d6b5a;
+    }
+
+    .chip-tag.tag-workshop {
+      background: #efe2ff;
+      color: #5e3ca5;
+    }
+
+    .chip-tag.tag-case {
+      background: #ffe9d9;
+      color: #8a3a0c;
+    }
+
+    .chip-tag.tag-social {
+      background: #ffe1f1;
+      color: #a21b5b;
+    }
+
+    .toggle-row {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: 13px;
+      color: var(--color-text-muted);
+    }
+
+    .switch {
+      width: 38px;
+      height: 20px;
+      border-radius: 999px;
+      background: #d0d0dd;
+      padding: 3px;
+      display: flex;
+      align-items: center;
+      transition: background 0.15s ease;
+    }
+
+    .switch-knob {
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      background: #ffffff;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.24);
+      transform: translateX(0);
+      transition: transform 0.15s ease;
+    }
+
+    .switch--on {
+      background: var(--color-primary);
+      justify-content: flex-end;
+    }
+
+    .switch--on .switch-knob {
+      transform: translateX(0);
+    }
+
+    @media (max-width: 768px) {
+      .filters-shell {
+        padding: var(--space-2);
+      }
+
+      .filters-row {
+        gap: var(--space-2);
+      }
+    }
+
+    /* EVENT LIST */
+    .events-column {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .events-header-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: var(--space-2);
+    }
+
+    .events-count {
+      font-size: 14px;
+      color: var(--color-text-muted);
+    }
+
+    .event-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .event-card {
+      background: var(--color-surface);
+      border-radius: var(--radius-card);
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow-1);
+      padding: var(--space-3);
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: var(--space-3);
+      align-items: flex-start;
+      transition: box-shadow 0.15s ease, transform 0.15s ease, border 0.15s ease;
+    }
+
+    .event-card:hover {
+      box-shadow: var(--shadow-2);
+      transform: translateY(-1px);
+      border-color: rgba(163, 25, 33, 0.18);
+    }
+
+    .event-main {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .event-title-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .event-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .event-meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      font-size: 13px;
+      color: var(--color-text-muted);
+    }
+
+    .event-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 999px;
+      background: #b0b0bb;
+    }
+
+    .event-description {
+      font-size: 14px;
+      color: var(--color-text-main);
+      line-height: 1.5;
+    }
+
+    .event-tags-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+    }
+
+    .event-side {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: var(--space-3);
+      font-size: 13px;
+    }
+
+    .event-badges {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: var(--space-2);
+    }
+
+    .badge-type {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-weight: 600;
+    }
+
+    .badge-type.hackathon {
+      background: #e3f1ff;
+      color: #145c9e;
+    }
+
+    .badge-type.talk {
+      background: #dff5f1;
+      color: #0d6b5a;
+    }
+
+    .badge-status {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .badge-status.success {
+      background: #e0f4e8;
+      color: var(--color-success);
+    }
+
+    .badge-status.warning {
+      background: #fff3cd;
+      color: var(--color-warning);
+    }
+
+    .card-actions {
+      display: flex;
+      gap: var(--space-2);
+    }
+
+    .btn {
+      border-radius: 999px;
+      border: none;
+      padding: 6px 14px;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-primary {
+      background: var(--color-primary);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background: var(--color-primary-dark);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--color-border);
+      color: var(--color-text-main);
+    }
+
+    .bookmark-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      border: 1px solid var(--color-border);
+      background: #fafafa;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .bookmark-btn.saved {
+      background: var(--color-primary-light);
+      color: var(--color-primary);
+      border-color: rgba(163, 25, 33, 0.6);
+    }
+
+    .event-footnote {
+      font-size: 11px;
+      color: var(--color-text-muted);
+    }
+
+    @media (max-width: 768px) {
+      .event-card {
+        grid-template-columns: 1fr;
+        padding: var(--space-3);
+      }
+
+      .event-side {
+        align-items: flex-start;
+      }
+
+      .events-header-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .panel {
+      background: var(--color-surface);
+      border-radius: var(--radius-card);
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow-1);
+      padding: var(--space-3);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .panel-title {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .panel-subtitle {
+      font-size: 12px;
+      color: var(--color-text-muted);
+    }
+
+    .saved-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .saved-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .saved-item-title {
+      font-weight: 500;
+    }
+
+    .saved-item-meta {
+      font-size: 11px;
+      color: var(--color-text-muted);
+    }
+
+    .chip-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+    }
+
+    .panel-footer-link {
+      font-size: 12px;
+      color: var(--color-primary);
+      cursor: pointer;
+    }
+
+    /* FOOTER */
+    .app-footer {
+      border-top: 1px solid var(--color-border);
+      padding: var(--space-3) var(--space-4);
+      font-size: 12px;
+      color: var(--color-text-muted);
+    }
+
+    .app-footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- HEADER / APP BAR -->
+    <header class="app-header">
+      <div class="app-header-inner">
+        <div class="brand">
+          <div class="brand-logo">EC</div>
+          <div class="brand-title">CMU Event Compass</div>
+        </div>
+        <div class="header-search">
+          <label class="search-input">
+            <span class="search-input-icon" aria-hidden="true"></span>
+            <input type="text" placeholder="Search events, speakers, or topics" />
+          </label>
+        </div>
+        <div class="header-user">
+          <button class="icon-button" aria-label="Notifications">🔔</button>
+          <button class="icon-button" aria-label="Settings">⚙️</button>
+          <div class="avatar" title="Amir">AK</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="app-main">
+      <div class="page-header">
+        <div class="page-title-row">
+          <div>
+            <div class="page-title">Discover CMU Events</div>
+            <div class="page-subtitle">Filter by school, topic, and format across Heinz, Tepper, HCII, SCS, and more.</div>
+          </div>
+        </div>
+        <section class="filters-shell" aria-label="Event filters">
+          <!-- Row 1: Date & School -->
+          <div class="filters-row">
+            <span class="filters-row-label">Date</span>
+            <button class="chip chip--active">This week</button>
+            <button class="chip">Today</button>
+            <button class="chip">This month</button>
+            <div class="select-input">Custom range</div>
+          </div>
+          <div class="filters-row">
+            <span class="filters-row-label">Hosting school</span>
+            <div class="select-input">All schools</div>
+            <div class="select-input">Heinz College</div>
+            <div class="select-input">Tepper</div>
+            <div class="select-input">SCS</div>
+          </div>
+
+          <!-- Row 2: Event type chips -->
+          <div class="filters-row">
+            <span class="filters-row-label">Event type</span>
+            <button class="chip chip--active">Hackathon</button>
+            <button class="chip">Talk</button>
+            <button class="chip">Workshop</button>
+            <button class="chip">Case competition</button>
+            <button class="chip">Social</button>
+          </div>
+
+          <!-- Row 3: Interests + toggle -->
+          <div class="filters-row" style="justify-content: space-between; align-items: center; gap: 16px;">
+            <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+              <span class="filters-row-label">Interests</span>
+              <button class="chip chip--active">AI / ML</button>
+              <button class="chip">HCI</button>
+              <button class="chip">Entrepreneurship</button>
+              <button class="chip">Policy</button>
+              <button class="chip">Data Science</button>
+            </div>
+            <div class="toggle-row">
+              <div class="switch switch--on">
+                <div class="switch-knob"></div>
+              </div>
+              <span>Only show my interests</span>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="app-main-inner">
+        <!-- EVENTS COLUMN -->
+        <section class="events-column" aria-label="Upcoming events">
+          <div class="events-header-row">
+            <h2 style="margin:0; font-size:18px;">Upcoming events</h2>
+            <span class="events-count">26 results · Showing this week</span>
+          </div>
+
+          <div class="event-list">
+            <!-- EVENT CARD 1 -->
+            <article class="event-card">
+              <div class="event-main">
+                <div class="event-title-row">
+                  <h3 class="event-title">AI for Social Impact: Building Responsible Civic Tech</h3>
+                  <span class="chip-tag tag-talk">Talk</span>
+                </div>
+                <div class="event-meta-row">
+                  <span>Wed · 6:00–7:30 PM</span>
+                  <span class="event-dot"></span>
+                  <span>Hamburg Hall 1204 · Heinz College</span>
+                  <span class="event-dot"></span>
+                  <span>Open to all CMU students</span>
+                </div>
+                <p class="event-description">
+                  Hear from alumni working at the intersection of AI, public interest technology, and
+                  government. Learn how to scope real-world problems, design responsible AI tools, and
+                  navigate careers in civic tech.
+                </p>
+                <div class="event-tags-row">
+                  <span class="chip-tag tag-talk">AI / ML</span>
+                  <span class="chip-tag">Public Interest Tech</span>
+                  <span class="chip-tag">Careers</span>
+                </div>
+              </div>
+              <div class="event-side">
+                <div class="event-badges">
+                  <span class="badge-type talk">Talk</span>
+                  <span class="badge-status success">Registered</span>
+                </div>
+                <div class="card-actions">
+                  <button class="btn btn-primary">Add to calendar</button>
+                  <button class="bookmark-btn saved" title="Saved">★</button>
+                </div>
+                <div class="event-footnote">Spots left · Free pizza provided</div>
+              </div>
+            </article>
+
+            <!-- EVENT CARD 2 -->
+            <article class="event-card">
+              <div class="event-main">
+                <div class="event-title-row">
+                  <h3 class="event-title">Tartanhacks 2026 – 24hr AI & Data Hackathon</h3>
+                  <span class="chip-tag tag-hackathon">Hackathon</span>
+                </div>
+                <div class="event-meta-row">
+                  <span>Fri · 7:00 PM – Sat · 7:00 PM</span>
+                  <span class="event-dot"></span>
+                  <span>Cohon Center · Rangos</span>
+                  <span class="event-dot"></span>
+                  <span>Hosted by ScottyLabs · SCS</span>
+                </div>
+                <p class="event-description">
+                  Team up with CMU students from across campus to build prototypes in AI, data, and HCI.
+                  Workshops, mentors, and sponsor challenges throughout the weekend.
+                </p>
+                <div class="event-tags-row">
+                  <span class="chip-tag tag-hackathon">AI / ML</span>
+                  <span class="chip-tag">HCI</span>
+                  <span class="chip-tag">Prototyping</span>
+                  <span class="chip-tag">Free food</span>
+                </div>
+              </div>
+              <div class="event-side">
+                <div class="event-badges">
+                  <span class="badge-type hackathon">Hackathon</span>
+                  <span class="badge-status warning">Limited spots</span>
+                </div>
+                <div class="card-actions">
+                  <button class="btn btn-primary">Register</button>
+                  <button class="bookmark-btn" title="Save">☆</button>
+                </div>
+                <div class="event-footnote">Applications close in 2 days</div>
+              </div>
+            </article>
+
+            <!-- EVENT CARD 3 -->
+            <article class="event-card">
+              <div class="event-main">
+                <div class="event-title-row">
+                  <h3 class="event-title">VentureBridge Founder Stories: From Idea to Seed Round</h3>
+                  <span class="chip-tag tag-case">Case competition</span>
+                </div>
+                <div class="event-meta-row">
+                  <span>Mon · 5:30–7:00 PM</span>
+                  <span class="event-dot"></span>
+                  <span>Tepper Quad · Simmons Auditorium</span>
+                  <span class="event-dot"></span>
+                  <span>Hosted by VentureBridge · Tepper</span>
+                </div>
+                <p class="event-description">
+                  Hear candid stories from CMU founders on fundraising, pivots, and building teams. Short
+                  breakout session to map your own venture idea and get feedback.
+                </p>
+                <div class="event-tags-row">
+                  <span class="chip-tag">Entrepreneurship</span>
+                  <span class="chip-tag">Startups</span>
+                  <span class="chip-tag">Networking</span>
+                </div>
+              </div>
+              <div class="event-side">
+                <div class="event-badges">
+                  <span class="badge-type">Fireside</span>
+                </div>
+                <div class="card-actions">
+                  <button class="btn btn-ghost">Add to calendar</button>
+                  <button class="bookmark-btn" title="Save">☆</button>
+                </div>
+                <div class="event-footnote">Snacks · Open to Heinz, Tepper, SCS, and HCII</div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!-- SIDEBAR COLUMN -->
+        <aside class="sidebar" aria-label="Shortcuts and saved events">
+          <!-- SAVED EVENTS PANEL -->
+          <section class="panel">
+            <div class="panel-title">Saved events</div>
+            <div class="panel-subtitle">Quick access to what you've bookmarked.</div>
+            <div class="saved-list">
+              <div class="saved-item">
+                <div class="saved-item-title">Intro to Product Management @ CMU</div>
+                <div class="saved-item-meta">Thu · 4:30 PM · Remote</div>
+              </div>
+              <div class="saved-item">
+                <div class="saved-item-title">Building Data Viz Portfolios</div>
+                <div class="saved-item-meta">Fri · 3:00 PM · Hunt Library</div>
+              </div>
+              <div class="saved-item">
+                <div class="saved-item-title">Heinz x Tepper Mixer</div>
+                <div class="saved-item-meta">Next week · Social</div>
+              </div>
+            </div>
+            <span class="panel-footer-link">View all saved events →</span>
+          </section>
+
+          <!-- TRENDING TAGS PANEL -->
+          <section class="panel">
+            <div class="panel-title">Trending tags</div>
+            <div class="panel-subtitle">Popular topics this week.</div>
+            <div class="chip-cloud">
+              <span class="chip-tag tag-hackathon">AI / ML</span>
+              <span class="chip-tag tag-workshop">Data viz</span>
+              <span class="chip-tag tag-social">Networking</span>
+              <span class="chip-tag">Internships</span>
+              <span class="chip-tag">Public policy</span>
+            </div>
+          </section>
+
+          <!-- QUICK FILTERS PANEL -->
+          <section class="panel">
+            <div class="panel-title">Quick filters</div>
+            <div class="panel-subtitle">Common shortcuts students use.</div>
+            <div class="chip-cloud">
+              <button class="chip">Free food</button>
+              <button class="chip">Beginner-friendly</button>
+              <button class="chip">Evenings only</button>
+              <button class="chip">Hybrid / Zoom</button>
+            </div>
+          </section>
+        </aside>
+      </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="app-footer">
+      <div class="app-footer-inner">
+        <span>© 2025 CMU Event Compass (Prototype)</span>
+        <div class="footer-links">
+          <span>About</span>
+          <span>Feedback</span>
+          <span>Privacy</span>
+          <span>Contact</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
 
