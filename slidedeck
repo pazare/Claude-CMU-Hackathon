@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CMU Event Compass – Calendar Add-On Pitch</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root {
+      --primary: #a31921; /* CMU red */
+      --primary-dark: #801119;
+      --bg: #050608;
+      --bg-soft: #12131a;
+      --surface: #1b1e27;
+      --surface-soft: #232733;
+      --text-main: #f7f7fa;
+      --text-muted: #9ea2b3;
+      --accent: #ffb347;
+      --radius-lg: 18px;
+      --shadow: 0 18px 45px rgba(0,0,0,0.6);
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 24px;
+      --space-6: 32px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top left, #25293a 0, #050608 55%);
+      color: var(--text-main);
+      min-height: 100vh;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .deck-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* HEADER */
+    .deck-header {
+      padding: var(--space-3) var(--space-5);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--primary), #f45f5c);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+    }
+
+    .brand-title {
+      font-weight: 600;
+      font-size: 18px;
+    }
+
+    .brand-tag {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .deck-header-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 768px) {
+      .deck-header {
+        padding-inline: var(--space-3);
+        flex-direction: row;
+      }
+      .deck-header-right {
+        display: none;
+      }
+    }
+
+    /* SLIDE AREA */
+    .deck-main {
+      flex: 1;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      padding: var(--space-5);
+      padding-top: var(--space-3);
+      padding-bottom: var(--space-3);
+    }
+
+    .slide-frame {
+      position: relative;
+      max-width: 960px;
+      width: 100%;
+      min-height: min(calc(100vh - 160px), 640px);
+      border-radius: 26px;
+      background: radial-gradient(circle at top left, #31364a 0, #171924 45%, #10121a 100%);
+      box-shadow: var(--shadow);
+      padding: var(--space-5);
+      display: none;
+      overflow: hidden;
+    }
+
+    .slide-frame.active {
+      display: flex;
+    }
+
+    .slide-grid {
+      display: grid;
+      grid-template-columns: 3fr 2fr;
+      gap: var(--space-5);
+      height: 100%;
+    }
+
+    @media (max-width: 900px) {
+      .deck-main {
+        padding-inline: var(--space-3);
+      }
+      .slide-frame {
+        padding: var(--space-4);
+        min-height: auto;
+      }
+      .slide-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-4);
+      }
+    }
+
+    .slide-title-kicker {
+      font-size: 12px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: var(--space-2);
+    }
+
+    .slide-title {
+      font-size: 32px;
+      line-height: 1.15;
+      font-weight: 650;
+      margin-bottom: var(--space-3);
+    }
+
+    .slide-subtitle {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: var(--space-4);
+    }
+
+    .slide-bullets {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      font-size: 14px;
+    }
+
+    .slide-bullets li {
+      display: flex;
+      gap: var(--space-2);
+      align-items: flex-start;
+    }
+
+    .slide-bullets li::before {
+      content: "•";
+      color: var(--accent);
+      margin-top: 1px;
+    }
+
+    .slide-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--text-muted);
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+
+    .slide-tag-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: var(--space-3);
+    }
+
+    .card {
+      background: radial-gradient(circle at top left, #3b4157 0, #202433 60%);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+      font-size: 13px;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .card-chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .card-chip {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.08);
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .timeline {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-3);
+    }
+
+    .timeline-step {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: var(--space-3);
+      align-items: flex-start;
+    }
+
+    .timeline-badge {
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      margin-top: 2px;
+    }
+
+    .timeline-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .timeline-body {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .quote {
+      font-size: 13px;
+      font-style: italic;
+      color: var(--text-muted);
+      border-left: 2px solid rgba(255,255,255,0.12);
+      padding-left: var(--space-3);
+    }
+
+    .metric-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+    }
+
+    .metric {
+      min-width: 120px;
+    }
+
+    .metric-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .metric-value {
+      font-size: 20px;
+      font-weight: 650;
+      color: var(--accent);
+    }
+
+    .metric-caption {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .footer-note {
+      font-size: 11px;
+      color: var(--text-muted);
+      opacity: 0.9;
+    }
+
+    /* SLIDE NUMBER */
+    .slide-number {
+      position: absolute;
+      top: 18px;
+      right: 24px;
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+    }
+
+    /* NAVIGATION */
+    .deck-footer {
+      padding: var(--space-3) var(--space-5) var(--space-4);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 768px) {
+      .deck-footer {
+        padding-inline: var(--space-3);
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: var(--space-2);
+      align-items: center;
+    }
+
+    .nav-btn {
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.03);
+      color: var(--text-main);
+      padding: 6px 14px;
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .nav-btn.primary {
+      background: linear-gradient(135deg, var(--primary), #f45f5c);
+      border-color: transparent;
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+
+    .dot-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.4);
+      background: transparent;
+    }
+
+    .dot.active {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <div class="deck-shell">
+    <!-- HEADER -->
+    <header class="deck-header">
+      <div class="brand">
+        <div class="brand-logo">EC</div>
+        <div>
+          <div class="brand-title">CMU Event Compass</div>
+          <div class="brand-tag">Smart Calendar Add-On</div>
+        </div>
+      </div>
+      <div class="deck-header-right">
+        <span>Prototype pitch · 5–6 slides</span>
+        <span>Use ← → keys or buttons below</span>
+      </div>
+    </header>
+
+    <!-- SLIDES -->
+    <main class="deck-main">
+      <!-- SLIDE 1 – TITLE -->
+      <section class="slide-frame active" data-slide="1">
+        <div class="slide-number">01 / 06</div>
+        <div class="slide-grid">
+          <div>
+            <div class="slide-title-kicker">Overview</div>
+            <div class="slide-title">
+              Stop copy-pasting events.<br />
+              Let your calendar do it for you.
+            </div>
+            <div class="slide-subtitle">
+              CMU students juggle dozens of talks, hackathons, mixers, and info sessions every week.
+              Our <strong>Event Compass Calendar Add-On</strong> auto-syncs events to Google or Apple
+              Calendar based on what students actually care about.
+            </div>
+            <ul class="slide-bullets">
+              <li>One place to discover events across Heinz, Tepper, HCII, SCS, etc.</li>
+              <li>One click to load a week of events that match your interests.</li>
+              <li>Zero manual typing into calendar apps.</li>
+            </ul>
+          </div>
+          <div>
+            <div class="card">
+              <div class="card-title">Vision</div>
+              <div>
+                <div class="card-chip-row">
+                  <span class="card-chip">CMU-wide event feed</span>
+                  <span class="card-chip">Smart tags</span>
+                  <span class="card-chip">Google &amp; Apple Calendar</span>
+                </div>
+              </div>
+              <div class="quote">
+                “I want every CMU student to open their calendar on Sunday and already
+                see the week’s best events waiting there.”
+              </div>
+              <div class="metric-row">
+                <div class="metric">
+                  <div class="metric-label">Target</div>
+                  <div class="metric-value">3×</div>
+                  <div class="metric-caption">More relevant events attended</div>
+                </div>
+                <div class="metric">
+                  <div class="metric-label">Clicks saved</div>
+                  <div class="metric-value">50+</div>
+                  <div class="metric-caption">per week for heavy event-goers</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 2 – PROBLEM -->
+      <section class="slide-frame" data-slide="2">
+        <div class="slide-number">02 / 06</div>
+        <div class="slide-grid">
+          <div>
+            <div class="slide-title-kicker">Problem</div>
+            <div class="slide-title">
+              Events are everywhere.<br />
+              Students’ time is not.
+            </div>
+            <div class="slide-subtitle">
+              CMU students discover events through emails, Discord, Slack, flyers, and random links.
+              The result: <strong>decision fatigue</strong>, missed opportunities, and calendars that
+              never reflect what’s actually happening on campus.
+            </div>
+            <ul class="slide-bullets">
+              <li>Events scattered across multiple schools and channels.</li>
+              <li>Students manually copy titles, times, and Zoom links into calendars.</li>
+              <li>High-value events clash because nothing is visible in one place.</li>
+            </ul>
+          </div>
+          <div>
+            <div class="card">
+              <div class="card-title">Current student workflow</div>
+              <ul class="slide-bullets">
+                <li>Skim 3–5 newsletters and group chats.</li>
+                <li>Open separate tabs for each event page.</li>
+                <li>Create calendar events by hand, one by one.</li>
+                <li>Forget to update when events move or Zoom links change.</li>
+              </ul>
+              <div class="pill-row">
+                <span class="slide-tag">
+                  <span class="slide-tag-dot"></span>
+                  Cognitive load ↑
+                </span>
+                <span class="slide-tag">
+                  <span class="slide-tag-dot"></span>
+                  Attendance friction ↑
+                </span>
+                <span class="slide-tag">
+                  <span class="slide-tag-dot"></span>
+                  Missed events ↑
+                </span>
+              </div>
+              <div class="footer-note">
+                When it’s this hard to add events, only the most motivated students show up.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 3 – SOLUTION -->
+      <section class="slide-frame" data-slide="3">
+        <div class="slide-number">03 / 06</div>
+        <div class="slide-grid">
+          <div>
+            <div class="slide-title-kicker">Solution</div>
+            <div class="slide-title">
+              An event add-on that thinks<br />
+              in “weeks” not “single events”.
+            </div>
+            <div class="slide-subtitle">
+              <strong>CMU Event Compass Calendar Add-On</strong> is a lightweight browser extension /
+              web integration that connects the CMU event feed directly to students’ calendars.
+              Instead of adding events one by one, students subscribe to a <strong>personalized weekly pack</strong>.
+            </div>
+            <ul class="slide-bullets">
+              <li>Works with Google Calendar and Apple Calendar.</li>
+              <li>Uses tags (AI/ML, HCI, entrepreneurship, policy, socials) and schools (Heinz, Tepper, etc.).</li>
+              <li>Pre-populates the next week’s events in one click.</li>
+            </ul>
+          </div>
+          <div>
+            <div class="card">
+              <div class="card-title">What changes for the student</div>
+              <ul class="slide-bullets">
+                <li>Instead of: “Add 7 events manually…”</li>
+                <li>They do: “Set my interests → Sync week → Done.”</li>
+              </ul>
+              <div class="pill-row">
+                <span class="slide-tag">
+                  <span class="slide-tag-dot"></span>
+                  Browser extension
+                </span>
+                <span class="slide-tag">
+                  <span class="slide-tag-dot"></span>
+                  Calendar subscription (ICS)
+                </span>
+                <span class="slide-tag">
+                  <span class="slide-tag-dot"></span>
+                  Secure CMU login
+                </span>
+              </div>
+              <div class="footer-note">
+                The calendar becomes the home for events – not email or Slack.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 4 – HOW IT WORKS -->
+      <section class="slide-frame" data-slide="4">
+        <div class="slide-number">04 / 06</div>
+        <div class="slide-grid">
+          <div>
+            <div class="slide-title-kicker">How it works</div>
+            <div class="slide-title">
+              From interests → to tags → to a pre-filled week.
+            </div>
+            <div class="slide-subtitle">
+              The system uses a tagged CMU event feed and a simple preference model to assemble
+              a weekly calendar for each student.
+            </div>
+            <div class="timeline">
+              <div class="timeline-step">
+                <div class="timeline-badge">1</div>
+                <div>
+                  <div class="timeline-title">Student selects interests</div>
+                  <div class="timeline-body">
+                    In the web app, the student picks tags like <strong>AI/ML</strong>,
+                    <strong>HCI</strong>, <strong>Entrepreneurship</strong>, “Free food”, or
+                    “Evenings only”.
+                  </div>
+                </div>
+              </div>
+              <div class="timeline-step">
+                <div class="timeline-badge">2</div>
+                <div>
+                  <div class="timeline-title">Add-on pulls CMU events</div>
+                  <div class="timeline-body">
+                    The add-on reads the unified CMU event feed (Heinz, Tepper, HCII, SCS, etc.),
+                    filters by tags, time, and conflicts.
+                  </div>
+                </div>
+              </div>
+              <div class="timeline-step">
+                <div class="timeline-badge">3</div>
+                <div>
+                  <div class="timeline-title">Next week is pre-populated</div>
+                  <div class="timeline-body">
+                    We generate a personal calendar stream for the upcoming week and push it to
+                    Google / Apple Calendar as one subscription – not 20 separate clicks.
+                  </div>
+                </div>
+              </div>
+              <div class="timeline-step">
+                <div class="timeline-badge">4</div>
+                <div>
+                  <div class="timeline-title">The system learns over time</div>
+                  <div class="timeline-body">
+                    As students attend or ignore events, we adjust the ranking: more of what they
+                    attend, less of what they skip. Fewer irrelevant events, more signal.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="card">
+              <div class="card-title">Under the hood</div>
+              <ul class="slide-bullets">
+                <li>Unified CMU events API or structured feed.</li>
+                <li>Tagging by topic, school, level, and format.</li>
+                <li>Simple preference engine that scores each event per student.</li>
+                <li>Calendar export via ICS file / API connection.</li>
+              </ul>
+              <div class="footer-note">
+                Implementation can start simple: weekly batch generation, then evolve into
+                real-time sync.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 5 – STUDENT EXPERIENCE -->
+      <section class="slide-frame" data-slide="5">
+        <div class="slide-number">05 / 06</div>
+        <div class="slide-grid">
+          <div>
+            <div class="slide-title-kicker">Student journey</div>
+            <div class="slide-title">
+              “Sunday night: I open my calendar and my week is already curated.”
+            </div>
+            <div class="slide-subtitle">
+              A quick narrative of what this feels like from the perspective of a CMU student.
+            </div>
+            <ul class="slide-bullets">
+              <li><strong>Setup:</strong> 60 seconds to choose interests and usual availability.</li>
+              <li><strong>Weekly rhythm:</strong> every Sunday, the add-on refreshes the upcoming week.</li>
+              <li><strong>Adjustments:</strong> student can uncheck events or pin “must-attend” ones.</li>
+              <li><strong>Reflection:</strong> the system learns: which tags = “yes”, which = “no”.</li>
+            </ul>
+          </div>
+          <div>
+            <div class="card">
+              <div class="card-title">Example: Data-driven Heinz student</div>
+              <div class="quote">
+                “I’m into AI, public interest tech, and early-stage startups. I don’t want 30 random
+                emails. I want 5–7 strong events per week that just show up in my Google Calendar.”
+              </div>
+              <div class="metric-row">
+                <div class="metric">
+                  <div class="metric-label">Manual steps</div>
+                  <div class="metric-value">↓ 80%</div>
+                  <div class="metric-caption">vs. adding each event individually</div>
+                </div>
+                <div class="metric">
+                  <div class="metric-label">Relevance</div>
+                  <div class="metric-value">↑ 2–3×</div>
+                  <div class="metric-caption">events match the student’s profile</div>
+                </div>
+              </div>
+              <div class="footer-note">
+                For CMU, this means better attendance, better use of speaker time, and stronger
+                cross-campus connections.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 6 – IMPACT & ROADMAP -->
+      <section class="slide-frame" data-slide="6">
+        <div class="slide-number">06 / 06</div>
+        <div class="slide-grid">
+          <div>
+            <div class="slide-title-kicker">Impact & roadmap</div>
+            <div class="slide-title">
+              Start with simple sync.<br />
+              Grow into a smart event companion.
+            </div>
+            <div class="slide-subtitle">
+              We can begin with a lightweight pilot and iterate based on student behavior and
+              feedback.
+            </div>
+            <ul class="slide-bullets">
+              <li><strong>Phase 1:</strong> Unified CMU event feed + basic tag filters + ICS export.</li>
+              <li><strong>Phase 2:</strong> Browser extension + “My weekly pack” button.</li>
+              <li><strong>Phase 3:</strong> Learning layer and recommendations (events you’ll likely enjoy).</li>
+              <li><strong>Phase 4:</strong> Deeper integrations – Canvas, SIO, and student org platforms.</li>
+            </ul>
+          </div>
+          <div>
+            <div class="card">
+              <div class="card-title">Why this matters for CMU</div>
+              <ul class="slide-bullets">
+                <li>Higher visibility for cross-school events and collaborations.</li>
+                <li>Better utilization of speaker time and event budgets.</li>
+                <li>Data on what topics actually resonate with students.</li>
+              </ul>
+              <div class="pill-row">
+                <span class="slide-tag">
+                  <span class="slide-tag-dot"></span>
+                  Less friction, more participation
+                </span>
+                <span class="slide-tag">
+                  <span class="slide-tag-dot"></span>
+                  Smarter campus experience
+                </span>
+              </div>
+              <div class="footer-note">
+                Next step: connect this prototype to the existing CMU Event Compass feed and
+                test with a small Heinz / Tepper cohort.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- NAVIGATION -->
+    <footer class="deck-footer">
+      <div>Use <strong>← →</strong> or buttons to move between slides.</div>
+      <div class="nav-buttons">
+        <button class="nav-btn" id="prevBtn">
+          ← Previous
+        </button>
+        <button class="nav-btn primary" id="nextBtn">
+          Next →
+        </button>
+      </div>
+      <div class="dot-row" id="dotRow"></div>
+    </footer>
+  </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll(".slide-frame"));
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const dotRow = document.getElementById("dotRow");
+    let currentIndex = 0;
+
+    // Build dots
+    slides.forEach((_, i) => {
+      const dot = document.createElement("div");
+      dot.className = "dot" + (i === 0 ? " active" : "");
+      dot.dataset.index = i;
+      dotRow.appendChild(dot);
+    });
+
+    const dots = Array.from(document.querySelectorAll(".dot"));
+
+    function updateSlide(newIndex) {
+      if (newIndex < 0 || newIndex >= slides.length) return;
+      slides[currentIndex].classList.remove("active");
+      dots[currentIndex].classList.remove("active");
+      currentIndex = newIndex;
+      slides[currentIndex].classList.add("active");
+      dots[currentIndex].classList.add("active");
+
+      prevBtn.disabled = currentIndex === 0;
+      nextBtn.disabled = currentIndex === slides.length - 1;
+      nextBtn.textContent = currentIndex === slides.length - 1 ? "End" : "Next →";
+      prevBtn.textContent = currentIndex === 0 ? "←" : "← Previous";
+    }
+
+    prevBtn.addEventListener("click", () => updateSlide(currentIndex - 1));
+    nextBtn.addEventListener("click", () => updateSlide(currentIndex + 1));
+
+    dots.forEach(dot => {
+      dot.addEventListener("click", () => {
+        updateSlide(Number(dot.dataset.index));
+      });
+    });
+
+    // Keyboard navigation
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight") updateSlide(currentIndex + 1);
+      if (e.key === "ArrowLeft") updateSlide(currentIndex - 1);
+    });
+
+    // Initialize buttons
+    updateSlide(0);
+  </script>
+</body>
+</html>
