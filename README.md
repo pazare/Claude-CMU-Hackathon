@@ -1,106 +1,64 @@
 # CMU Event Compass
 
-A unified web application for CMU students to discover events across multiple siloed platforms (Tepper, Heinz, HCII, SCS, Dietrich, University-wide) in one interface.
+<!-- PABLO-CONFIRM: exact hackathon name and date — draft says "the Claude CMU Hackathon, November 2025". Fix if the official event name differs. -->
+A hackathon prototype that unifies CMU event discovery into one personalized feed. Built with Claude at the Claude CMU Hackathon, November 2025.
 
-## Features
+**Live demo:** https://pazare.github.io/Claude-CMU-Hackathon/
+**Pitch deck:** https://pazare.github.io/Claude-CMU-Hackathon/pitch.html
 
-- **Interest-based filtering**: Set your interests and see prioritized events
-- **Multi-source aggregation**: Browse events from different CMU schools and centers
-- **Advanced filtering**: Filter by date range, source, format, and search query
-- **Persistent preferences**: Your selections are saved in localStorage
-- **Responsive design**: Works seamlessly on desktop and mobile
-- **Clean, accessible UI**: Built with accessibility best practices
+## The problem
 
-## Tech Stack
+CMU events live in silos. Heinz, Tepper, SCS, HCII, and university-wide calendars each publish separately, and students discover events through a mix of newsletters, Discord, Slack, and flyers. The result is decision fatigue, missed opportunities, and calendars that never reflect what is actually happening on campus.
 
-- **Framework**: Next.js 14 (App Router)
-- **Language**: TypeScript
-- **Styling**: TailwindCSS
-- **State Management**: React Hooks
+## What it does
 
-## Getting Started
+Event Compass puts every school's events in one feed and lets students filter by what they care about:
 
-### Installation
+- **Interest-based filtering** with tags like AI / ML, HCI, entrepreneurship, policy, and data science
+- **Multi-source aggregation** across Heinz, Tepper, SCS, HCII, Dietrich, and university-wide calendars
+- **Date, format, and source filters** plus free-text search
+- **Persistent preferences** saved locally, so the feed stays personalized between visits
+
+The pitch deck extends the concept to a calendar add-on: students set interests once, and the upcoming week's matching events sync to Google or Apple Calendar as a single subscription instead of one-by-one manual entry.
+
+## What is in this repo
+
+Three artifacts from the hackathon day:
+
+| Path | What it is |
+|---|---|
+| `index.html` | Static high-fidelity mock of the home feed. This is what the live demo serves. |
+| `pitch.html` | Six-slide pitch deck for the calendar add-on concept, built as a standalone page. |
+| `app/`, `components/`, `lib/`, `data/`, `types/` | Working Next.js 14 + TypeScript prototype of the same design, with functional filtering, onboarding, and localStorage persistence. |
+
+## Running the Next.js prototype
 
 ```bash
 npm install
-```
-
-### Development
-
-```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Then open http://localhost:3000. The static demo and pitch deck need only a browser.
 
-### Building for Production
+## How Claude was used
 
-```bash
-npm run build
-npm start
-```
+<!-- PABLO-CONFIRM: verify this paragraph matches how Claude was actually used during the hackathon before pushing. -->
+Claude generated and iterated on all three artifacts during the hackathon: the static mock, the pitch deck, and the Next.js implementation. Human direction covered product scope, the unification concept, information architecture, and CMU-specific details such as schools, venues, and event types.
 
-## Project Structure
+## Honest limitations
 
-```
-├── app/
-│   ├── layout.tsx          # Root layout
-│   ├── page.tsx            # Main dashboard page
-│   └── globals.css         # Global styles
-├── components/
-│   ├── EventCard.tsx       # Event display card
-│   ├── FiltersPanel.tsx    # Filter controls
-│   ├── InterestSelector.tsx # Interest selection UI
-│   ├── OnboardingCard.tsx  # First-time user onboarding
-│   ├── SearchBar.tsx       # Search input
-│   ├── DateRangeSelector.tsx
-│   ├── SourceFilter.tsx
-│   └── EmptyState.tsx      # Empty state component
-├── lib/
-│   ├── filters.ts          # Filtering and sorting logic
-│   ├── formatters.ts       # Date/time formatting utilities
-│   └── storage.ts          # localStorage persistence
-├── data/
-│   └── events.ts           # Mock event data (TODO: replace with API)
-└── types/
-    └── events.ts           # TypeScript type definitions
-```
+This is a one-day hackathon prototype, not a production system:
 
-## Extending the App
+- Event data is mock data in `data/events.ts`. There is no live integration with CMU calendar feeds yet.
+- The static mock and the Next.js app are parallel implementations of the same design, not a single codebase.
+- Preferences live in localStorage only. There are no accounts and no backend.
 
-### Adding Real Data Sources
+## Roadmap to a real product
 
-The app currently uses mock data from `data/events.ts`. To integrate real APIs or ICS feeds:
-
-1. Replace the `mockEvents` import in `app/page.tsx` with a data fetching function
-2. Use Next.js API routes or client-side fetch to retrieve data
-3. Transform the external data format to match the `Event` interface
-
-### Adding More Event Types
-
-To add new event formats or interest tags:
-
-1. Update the type definitions in `types/events.ts`
-2. Add corresponding color mappings in `lib/formatters.ts` (for formats)
-3. Update the filter components to include new options
-
-### Customizing Colors
-
-Color scheme customization points:
-
-- **CMU Red**: Defined in `tailwind.config.ts` as `cmu-red`
-- **Format Badges**: Modify `getFormatBadgeClasses()` in `lib/formatters.ts`
-- **Interest Tags**: Update styling in `InterestSelector.tsx` and `EventCard.tsx`
-
-## Architecture Notes
-
-- **Filtering Pipeline**: Pure functions in `lib/filters.ts` make it easy to test and extend
-- **Persistence**: All preferences saved to localStorage for seamless user experience
-- **Component Design**: Modular components make it easy to customize individual features
-- **Type Safety**: Full TypeScript coverage ensures type safety across the application
+1. Replace mock data with real sources, parsing ICS feeds or scraping the public calendars of each school.
+2. Ship the calendar subscription described in the pitch deck, generating a per-student ICS feed.
+3. Add lightweight preference learning so the ranking improves as students accept or skip events.
 
 ## License
 
-MIT
-
+MIT. See `LICENSE`.
