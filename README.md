@@ -1,8 +1,6 @@
 # CMU Event Compass
 
-<!-- PABLO-CONFIRM: exact hackathon name and date — draft says "the Claude CMU Hackathon, November 2025". Fix if the official event name differs. -->
-
-A hackathon prototype that unifies CMU event discovery into one personalized feed. Built with Claude at the Claude CMU Hackathon, November 2025.
+A hackathon prototype that unifies CMU event discovery into one personalized feed. Built with Claude at a CMU hackathon in November 2025.
 
 **Live demo:** https://pazare.github.io/Claude-CMU-Hackathon/
 **Pitch deck:** https://pazare.github.io/Claude-CMU-Hackathon/pitch.html
@@ -61,8 +59,6 @@ A GitHub Actions workflow (`.github/workflows/ci.yml`) runs typecheck, lint,
 format check, tests, and build on every push and pull request.
 
 ## How Claude was used
-
-<!-- PABLO-CONFIRM: verify this paragraph matches how Claude was actually used during the hackathon before pushing. -->
 
 Claude generated and iterated on all three artifacts during the hackathon: the static mock, the pitch deck, and the Next.js implementation. Human direction covered product scope, the unification concept, information architecture, and CMU-specific details such as schools, venues, and event types.
 
