@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="CMU Event Compass — a unified, personalized feed of CMU events across Heinz, Tepper, SCS, HCII, Dietrich, and university-wide calendars." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23a31921'/><text x='16' y='22' font-size='16' fill='white' text-anchor='middle' font-family='sans-serif' font-weight='700'>EC</text></svg>" />
   <title>CMU Event Compass – Home Feed</title>
   <style>
     :root {
@@ -41,6 +43,11 @@
     a {
       color: inherit;
       text-decoration: none;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--color-primary, #a31921);
+      outline-offset: 2px;
     }
 
     .app-shell {
@@ -241,6 +248,7 @@
     .page-title {
       font-size: 28px;
       font-weight: 600;
+      margin: 0;
     }
 
     .page-subtitle {
@@ -291,6 +299,16 @@
       font-size: 13px;
       gap: 6px;
       cursor: pointer;
+      color: var(--color-text-main);
+      font-family: inherit;
+      line-height: normal;
+    }
+
+    .select-input.chip--active {
+      background: var(--color-primary-light);
+      color: var(--color-primary);
+      border-color: rgba(163, 25, 33, 0.4);
+      font-weight: 500;
     }
 
     .select-input::after {
@@ -312,6 +330,7 @@
       background: #fafafa;
       color: var(--color-text-main);
       cursor: pointer;
+      font-family: inherit;
       transition: background 0.15s ease, border 0.15s ease, color 0.15s ease;
     }
 
@@ -541,12 +560,14 @@
 
     .badge-status.success {
       background: #e0f4e8;
-      color: var(--color-success);
+      /* Darkened from --color-success to meet WCAG AA (6.43:1 at 11px). */
+      color: #15623a;
     }
 
     .badge-status.warning {
       background: #fff3cd;
-      color: var(--color-warning);
+      /* Darkened from --color-warning to meet WCAG AA (5.00:1 at 11px). */
+      color: #8a6100;
     }
 
     .card-actions {
@@ -719,12 +740,12 @@
         <div class="header-search">
           <label class="search-input">
             <span class="search-input-icon" aria-hidden="true"></span>
-            <input type="text" placeholder="Search events, speakers, or topics" />
+            <input type="text" placeholder="Search events, speakers, or topics" aria-label="Search events, speakers, or topics" />
           </label>
         </div>
         <div class="header-user">
-          <button class="icon-button" aria-label="Notifications">🔔</button>
-          <button class="icon-button" aria-label="Settings">⚙️</button>
+          <button class="icon-button" type="button" aria-label="Notifications"><span aria-hidden="true">🔔</span></button>
+          <button class="icon-button" type="button" aria-label="Settings"><span aria-hidden="true">⚙️</span></button>
           <div class="avatar" title="Amir">AK</div>
         </div>
       </div>
@@ -735,7 +756,7 @@
       <div class="page-header">
         <div class="page-title-row">
           <div>
-            <div class="page-title">Discover CMU Events</div>
+            <h1 class="page-title">Discover CMU Events</h1>
             <div class="page-subtitle">Filter by school, topic, and format across Heinz, Tepper, HCII, SCS, and more.</div>
           </div>
         </div>
@@ -743,41 +764,44 @@
           <!-- Row 1: Date & School -->
           <div class="filters-row">
             <span class="filters-row-label">Date</span>
-            <button class="chip chip--active">This week</button>
-            <button class="chip">Today</button>
-            <button class="chip">This month</button>
-            <div class="select-input">Custom range</div>
+            <button type="button" class="chip chip--active" aria-pressed="true">This week</button>
+            <button type="button" class="chip" aria-pressed="false">Today</button>
+            <button type="button" class="chip" aria-pressed="false">This month</button>
+            <button type="button" class="select-input">Custom range</button>
           </div>
           <div class="filters-row">
             <span class="filters-row-label">Hosting school</span>
-            <div class="select-input">All schools</div>
-            <div class="select-input">Heinz College</div>
-            <div class="select-input">Tepper</div>
-            <div class="select-input">SCS</div>
+            <button type="button" class="select-input chip--active" aria-pressed="true">All schools</button>
+            <button type="button" class="select-input" aria-pressed="false">Heinz</button>
+            <button type="button" class="select-input" aria-pressed="false">Tepper</button>
+            <button type="button" class="select-input" aria-pressed="false">SCS</button>
+            <button type="button" class="select-input" aria-pressed="false">HCII</button>
+            <button type="button" class="select-input" aria-pressed="false">Dietrich</button>
+            <button type="button" class="select-input" aria-pressed="false">University-wide</button>
           </div>
 
           <!-- Row 2: Event type chips -->
           <div class="filters-row">
             <span class="filters-row-label">Event type</span>
-            <button class="chip chip--active">Hackathon</button>
-            <button class="chip">Talk</button>
-            <button class="chip">Workshop</button>
-            <button class="chip">Case competition</button>
-            <button class="chip">Social</button>
+            <button type="button" class="chip chip--active" aria-pressed="true">Hackathon</button>
+            <button type="button" class="chip" aria-pressed="false">Talk</button>
+            <button type="button" class="chip" aria-pressed="false">Workshop</button>
+            <button type="button" class="chip" aria-pressed="false">Case competition</button>
+            <button type="button" class="chip" aria-pressed="false">Social</button>
           </div>
 
           <!-- Row 3: Interests + toggle -->
           <div class="filters-row" style="justify-content: space-between; align-items: center; gap: 16px;">
             <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
               <span class="filters-row-label">Interests</span>
-              <button class="chip chip--active">AI / ML</button>
-              <button class="chip">HCI</button>
-              <button class="chip">Entrepreneurship</button>
-              <button class="chip">Policy</button>
-              <button class="chip">Data Science</button>
+              <button type="button" class="chip chip--active" aria-pressed="true">AI / ML</button>
+              <button type="button" class="chip" aria-pressed="false">HCI</button>
+              <button type="button" class="chip" aria-pressed="false">Entrepreneurship</button>
+              <button type="button" class="chip" aria-pressed="false">Policy</button>
+              <button type="button" class="chip" aria-pressed="false">Data Science</button>
             </div>
             <div class="toggle-row">
-              <div class="switch switch--on">
+              <div class="switch switch--on" role="switch" aria-checked="true" tabindex="0" aria-label="Only show my interests">
                 <div class="switch-knob"></div>
               </div>
               <span>Only show my interests</span>
@@ -826,8 +850,8 @@
                   <span class="badge-status success">Registered</span>
                 </div>
                 <div class="card-actions">
-                  <button class="btn btn-primary">Add to calendar</button>
-                  <button class="bookmark-btn saved" title="Saved">★</button>
+                  <button type="button" class="btn btn-primary">Add to calendar</button>
+                  <button type="button" class="bookmark-btn saved" title="Saved" aria-label="Saved" aria-pressed="true"><span aria-hidden="true">★</span></button>
                 </div>
                 <div class="event-footnote">Spots left · Free pizza provided</div>
               </div>
@@ -864,8 +888,8 @@
                   <span class="badge-status warning">Limited spots</span>
                 </div>
                 <div class="card-actions">
-                  <button class="btn btn-primary">Register</button>
-                  <button class="bookmark-btn" title="Save">☆</button>
+                  <button type="button" class="btn btn-primary">Register</button>
+                  <button type="button" class="bookmark-btn" title="Save" aria-label="Save event" aria-pressed="false"><span aria-hidden="true">☆</span></button>
                 </div>
                 <div class="event-footnote">Applications close in 2 days</div>
               </div>
@@ -876,7 +900,7 @@
               <div class="event-main">
                 <div class="event-title-row">
                   <h3 class="event-title">VentureBridge Founder Stories: From Idea to Seed Round</h3>
-                  <span class="chip-tag tag-case">Case competition</span>
+                  <span class="chip-tag tag-talk">Fireside</span>
                 </div>
                 <div class="event-meta-row">
                   <span>Mon · 5:30–7:00 PM</span>
@@ -897,11 +921,11 @@
               </div>
               <div class="event-side">
                 <div class="event-badges">
-                  <span class="badge-type">Fireside</span>
+                  <span class="badge-type talk">Fireside</span>
                 </div>
                 <div class="card-actions">
-                  <button class="btn btn-ghost">Add to calendar</button>
-                  <button class="bookmark-btn" title="Save">☆</button>
+                  <button type="button" class="btn btn-ghost">Add to calendar</button>
+                  <button type="button" class="bookmark-btn" title="Save" aria-label="Save event" aria-pressed="false"><span aria-hidden="true">☆</span></button>
                 </div>
                 <div class="event-footnote">Snacks · Open to Heinz, Tepper, SCS, and HCII</div>
               </div>
@@ -929,7 +953,7 @@
                 <div class="saved-item-meta">Next week · Social</div>
               </div>
             </div>
-            <span class="panel-footer-link">View all saved events →</span>
+            <a href="#" class="panel-footer-link">View all saved events →</a>
           </section>
 
           <!-- TRENDING TAGS PANEL -->
@@ -950,10 +974,10 @@
             <div class="panel-title">Quick filters</div>
             <div class="panel-subtitle">Common shortcuts students use.</div>
             <div class="chip-cloud">
-              <button class="chip">Free food</button>
-              <button class="chip">Beginner-friendly</button>
-              <button class="chip">Evenings only</button>
-              <button class="chip">Hybrid / Zoom</button>
+              <button type="button" class="chip" aria-pressed="false">Free food</button>
+              <button type="button" class="chip" aria-pressed="false">Beginner-friendly</button>
+              <button type="button" class="chip" aria-pressed="false">Evenings only</button>
+              <button type="button" class="chip" aria-pressed="false">Hybrid / Zoom</button>
             </div>
           </section>
         </aside>
@@ -965,10 +989,10 @@
       <div class="app-footer-inner">
         <span>© 2025 CMU Event Compass (Prototype)</span>
         <div class="footer-links">
-          <span>About</span>
-          <span>Feedback</span>
-          <span>Privacy</span>
-          <span>Contact</span>
+          <a href="#">About</a>
+          <a href="#">Feedback</a>
+          <a href="#">Privacy</a>
+          <a href="#">Contact</a>
         </div>
       </div>
     </footer>

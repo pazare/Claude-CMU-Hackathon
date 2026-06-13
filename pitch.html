@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <title>CMU Event Compass – Calendar Add-On Pitch</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Pitch deck for the CMU Event Compass calendar add-on that auto-syncs relevant CMU events to Google and Apple Calendar." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23a31921'/><text x='16' y='22' font-size='16' fill='white' text-anchor='middle' font-family='sans-serif' font-weight='700'>EC</text></svg>" />
   <style>
     :root {
       --primary: #a31921; /* CMU red */
@@ -13,7 +15,7 @@
       --surface: #1b1e27;
       --surface-soft: #232733;
       --text-main: #f7f7fa;
-      --text-muted: #9ea2b3;
+      --text-muted: #b6bac9;
       --accent: #ffb347;
       --radius-lg: 18px;
       --shadow: 0 18px 45px rgba(0,0,0,0.6);
@@ -80,6 +82,7 @@
     .brand-title {
       font-weight: 600;
       font-size: 18px;
+      margin: 0;
     }
 
     .brand-tag {
@@ -168,6 +171,7 @@
       font-size: 32px;
       line-height: 1.15;
       font-weight: 650;
+      margin-top: 0;
       margin-bottom: var(--space-3);
     }
 
@@ -245,6 +249,7 @@
       font-size: 14px;
       font-weight: 600;
       color: var(--text-main);
+      margin: 0;
     }
 
     .card-chip-row {
@@ -352,7 +357,7 @@
       font-size: 11px;
       letter-spacing: 0.15em;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.5);
+      color: rgba(255,255,255,0.7);
     }
 
     /* NAVIGATION */
@@ -412,14 +417,25 @@
     .dot {
       width: 8px;
       height: 8px;
+      padding: 0;
+      margin: 0;
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,0.4);
       background: transparent;
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
     }
 
     .dot.active {
       background: var(--accent);
       border-color: var(--accent);
+    }
+
+    .nav-btn:focus-visible,
+    .dot:focus-visible {
+      outline: 2px solid rgba(255, 255, 255, 0.85);
+      outline-offset: 2px;
     }
   </style>
 </head>
@@ -430,12 +446,12 @@
       <div class="brand">
         <div class="brand-logo">EC</div>
         <div>
-          <div class="brand-title">CMU Event Compass</div>
+          <h1 class="brand-title">CMU Event Compass</h1>
           <div class="brand-tag">Smart Calendar Add-On</div>
         </div>
       </div>
       <div class="deck-header-right">
-        <span>Prototype pitch · 5–6 slides</span>
+        <span>Prototype pitch · 6 slides</span>
         <span>Use ← → keys or buttons below</span>
       </div>
     </header>
@@ -448,10 +464,10 @@
         <div class="slide-grid">
           <div>
             <div class="slide-title-kicker">Overview</div>
-            <div class="slide-title">
+            <h2 class="slide-title">
               Stop copy-pasting events.<br />
               Let your calendar do it for you.
-            </div>
+            </h2>
             <div class="slide-subtitle">
               CMU students juggle dozens of talks, hackathons, mixers, and info sessions every week.
               Our <strong>Event Compass Calendar Add-On</strong> auto-syncs events to Google or Apple
@@ -465,7 +481,7 @@
           </div>
           <div>
             <div class="card">
-              <div class="card-title">Vision</div>
+              <h3 class="card-title">Vision</h3>
               <div>
                 <div class="card-chip-row">
                   <span class="card-chip">CMU-wide event feed</span>
@@ -500,10 +516,10 @@
         <div class="slide-grid">
           <div>
             <div class="slide-title-kicker">Problem</div>
-            <div class="slide-title">
+            <h2 class="slide-title">
               Events are everywhere.<br />
               Students’ time is not.
-            </div>
+            </h2>
             <div class="slide-subtitle">
               CMU students discover events through emails, Discord, Slack, flyers, and random links.
               The result: <strong>decision fatigue</strong>, missed opportunities, and calendars that
@@ -517,7 +533,7 @@
           </div>
           <div>
             <div class="card">
-              <div class="card-title">Current student workflow</div>
+              <h3 class="card-title">Current student workflow</h3>
               <ul class="slide-bullets">
                 <li>Skim 3–5 newsletters and group chats.</li>
                 <li>Open separate tabs for each event page.</li>
@@ -552,10 +568,10 @@
         <div class="slide-grid">
           <div>
             <div class="slide-title-kicker">Solution</div>
-            <div class="slide-title">
+            <h2 class="slide-title">
               An event add-on that thinks<br />
               in “weeks” not “single events”.
-            </div>
+            </h2>
             <div class="slide-subtitle">
               <strong>CMU Event Compass Calendar Add-On</strong> is a lightweight browser extension /
               web integration that connects the CMU event feed directly to students’ calendars.
@@ -569,7 +585,7 @@
           </div>
           <div>
             <div class="card">
-              <div class="card-title">What changes for the student</div>
+              <h3 class="card-title">What changes for the student</h3>
               <ul class="slide-bullets">
                 <li>Instead of: “Add 7 events manually…”</li>
                 <li>They do: “Set my interests → Sync week → Done.”</li>
@@ -602,9 +618,9 @@
         <div class="slide-grid">
           <div>
             <div class="slide-title-kicker">How it works</div>
-            <div class="slide-title">
+            <h2 class="slide-title">
               From interests → to tags → to a pre-filled week.
-            </div>
+            </h2>
             <div class="slide-subtitle">
               The system uses a tagged CMU event feed and a simple preference model to assemble
               a weekly calendar for each student.
@@ -655,7 +671,7 @@
           </div>
           <div>
             <div class="card">
-              <div class="card-title">Under the hood</div>
+              <h3 class="card-title">Under the hood</h3>
               <ul class="slide-bullets">
                 <li>Unified CMU events API or structured feed.</li>
                 <li>Tagging by topic, school, level, and format.</li>
@@ -677,9 +693,9 @@
         <div class="slide-grid">
           <div>
             <div class="slide-title-kicker">Student journey</div>
-            <div class="slide-title">
+            <h2 class="slide-title">
               “Sunday night: I open my calendar and my week is already curated.”
-            </div>
+            </h2>
             <div class="slide-subtitle">
               A quick narrative of what this feels like from the perspective of a CMU student.
             </div>
@@ -692,7 +708,7 @@
           </div>
           <div>
             <div class="card">
-              <div class="card-title">Example: Data-driven Heinz student</div>
+              <h3 class="card-title">Example: Data-driven Heinz student</h3>
               <div class="quote">
                 “I’m into AI, public interest tech, and early-stage startups. I don’t want 30 random
                 emails. I want 5–7 strong events per week that just show up in my Google Calendar.”
@@ -724,10 +740,10 @@
         <div class="slide-grid">
           <div>
             <div class="slide-title-kicker">Impact & roadmap</div>
-            <div class="slide-title">
+            <h2 class="slide-title">
               Start with simple sync.<br />
               Grow into a smart event companion.
-            </div>
+            </h2>
             <div class="slide-subtitle">
               We can begin with a lightweight pilot and iterate based on student behavior and
               feedback.
@@ -741,7 +757,7 @@
           </div>
           <div>
             <div class="card">
-              <div class="card-title">Why this matters for CMU</div>
+              <h3 class="card-title">Why this matters for CMU</h3>
               <ul class="slide-bullets">
                 <li>Higher visibility for cross-school events and collaborations.</li>
                 <li>Better utilization of speaker time and event budgets.</li>
@@ -791,9 +807,12 @@
 
     // Build dots
     slides.forEach((_, i) => {
-      const dot = document.createElement("div");
+      const dot = document.createElement("button");
+      dot.type = "button";
       dot.className = "dot" + (i === 0 ? " active" : "");
       dot.dataset.index = i;
+      dot.setAttribute("aria-label", "Go to slide " + (i + 1));
+      if (i === 0) dot.setAttribute("aria-current", "true");
       dotRow.appendChild(dot);
     });
 
@@ -803,9 +822,11 @@
       if (newIndex < 0 || newIndex >= slides.length) return;
       slides[currentIndex].classList.remove("active");
       dots[currentIndex].classList.remove("active");
+      dots[currentIndex].removeAttribute("aria-current");
       currentIndex = newIndex;
       slides[currentIndex].classList.add("active");
       dots[currentIndex].classList.add("active");
+      dots[currentIndex].setAttribute("aria-current", "true");
 
       prevBtn.disabled = currentIndex === 0;
       nextBtn.disabled = currentIndex === slides.length - 1;
