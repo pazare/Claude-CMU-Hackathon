@@ -1,32 +1,38 @@
 import { Event } from "@/types/events";
 
-// Mock event data for CMU Event Compass
-// TODO: Replace with real API calls or ICS feed parsing
-// Structure is designed to be easily swapped with API integration
+// Mock event data for CMU Event Compass.
+// TODO: Replace with real API calls or ICS feed parsing.
+//
+// Events are stored as offsets relative to "now" and resolved at call time by
+// getMockEvents(), so the seeded "Today"/"This Week" events stay correct no
+// matter when the page is loaded. Resolving on the client (rather than freezing
+// the dates at module-evaluation time on the server) also avoids any
+// server/client date drift. The shape is intentionally easy to swap for an API
+// integration: replace getMockEvents() with a fetch + transform.
 
-const now = new Date();
-const getDate = (daysOffset: number, hours: number = 12) => {
-  const date = new Date(now);
-  date.setDate(date.getDate() + daysOffset);
-  date.setHours(hours, 0, 0, 0);
-  return date.toISOString();
+type EventSeed = Omit<Event, "startTime" | "endTime"> & {
+  /** Day offset from today for the event start (negative = past). */
+  startDay: number;
+  /** Hour of day (0–23) for the event start. */
+  startHour: number;
+  /** Day offset for the end, for multi-day events. Defaults to startDay. */
+  endDay?: number;
+  /** Hour of day for the end, used with endDay. */
+  endHour?: number;
+  /** Duration in hours for same-day events (used when endDay is omitted). */
+  durationHours?: number;
 };
 
-const getEndDate = (startISO: string, hours: number = 2) => {
-  const date = new Date(startISO);
-  date.setHours(date.getHours() + hours);
-  return date.toISOString();
-};
-
-export const mockEvents: Event[] = [
+const EVENT_SEEDS: EventSeed[] = [
   // Today's events
   {
     id: "1",
     title: "AI & Machine Learning Research Talk",
     description:
       "Join us for an exciting talk on the latest developments in deep learning and neural networks, featuring guest speakers from industry.",
-    startTime: getDate(0, 14),
-    endTime: getEndDate(getDate(0, 14)),
+    startDay: 0,
+    startHour: 14,
+    durationHours: 2,
     location: "Gates Hillman Center, Room 4401",
     source: "SCS",
     format: "Talk",
@@ -39,8 +45,9 @@ export const mockEvents: Event[] = [
     title: "HCI Design Workshop",
     description:
       "Hands-on workshop on user-centered design methodologies and prototyping techniques for interactive systems.",
-    startTime: getDate(0, 16),
-    endTime: getEndDate(getDate(0, 16), 3),
+    startDay: 0,
+    startHour: 16,
+    durationHours: 3,
     location: "Newell-Simon Hall, Room 1305",
     source: "HCII",
     format: "Workshop",
@@ -51,11 +58,13 @@ export const mockEvents: Event[] = [
   // This week
   {
     id: "3",
-    title: "CMU TartanHacks 2025",
+    title: "CMU TartanHacks 2026",
     description:
       "Annual 36-hour hackathon bringing together students from across CMU to build innovative projects. Prizes, mentorship, and free food!",
-    startTime: getDate(2, 18),
-    endTime: getDate(4, 12),
+    startDay: 2,
+    startHour: 18,
+    endDay: 4,
+    endHour: 12,
     location: "Gates Hillman Center",
     source: "University-wide",
     format: "Hackathon",
@@ -68,8 +77,9 @@ export const mockEvents: Event[] = [
     title: "Healthcare Innovation Case Competition",
     description:
       "Teams compete to solve real-world healthcare challenges. Winners receive cash prizes and opportunities to present to industry leaders.",
-    startTime: getDate(3, 10),
-    endTime: getEndDate(getDate(3, 10), 5),
+    startDay: 3,
+    startHour: 10,
+    durationHours: 5,
     location: "Tepper Quad, Room 5501",
     source: "Tepper",
     format: "Case Competition",
@@ -82,8 +92,9 @@ export const mockEvents: Event[] = [
     title: "Data Science Career Fair",
     description:
       "Meet recruiters from top tech companies looking for data scientists, analysts, and ML engineers. Bring your resume!",
-    startTime: getDate(4, 13),
-    endTime: getEndDate(getDate(4, 13), 4),
+    startDay: 4,
+    startHour: 13,
+    durationHours: 4,
     location: "University Center, Rangos Ballroom",
     source: "SCS",
     format: "Career/Networking",
@@ -97,8 +108,9 @@ export const mockEvents: Event[] = [
     title: "Policy & Technology Panel Discussion",
     description:
       "Experts discuss the intersection of technology policy, AI governance, and societal impact.",
-    startTime: getDate(7, 17),
-    endTime: getEndDate(getDate(7, 17)),
+    startDay: 7,
+    startHour: 17,
+    durationHours: 2,
     location: "Heinz College, Room 1102",
     source: "Heinz",
     format: "Talk",
@@ -111,8 +123,9 @@ export const mockEvents: Event[] = [
     title: "Startup Pitch Night",
     description:
       "Watch CMU student entrepreneurs pitch their startup ideas to a panel of investors and mentors.",
-    startTime: getDate(10, 19),
-    endTime: getEndDate(getDate(10, 19), 2),
+    startDay: 10,
+    startHour: 19,
+    durationHours: 2,
     location: "Tepper Quad, Auditorium",
     source: "Tepper",
     format: "Talk",
@@ -125,8 +138,9 @@ export const mockEvents: Event[] = [
     title: "Robotics Lab Open House",
     description:
       "Tour the robotics lab, see demos of cutting-edge robots, and chat with researchers about ongoing projects.",
-    startTime: getDate(12, 14),
-    endTime: getEndDate(getDate(12, 14), 3),
+    startDay: 12,
+    startHour: 14,
+    durationHours: 3,
     location: "Newell-Simon Hall, Robotics Lab",
     source: "SCS",
     format: "Workshop",
@@ -138,8 +152,9 @@ export const mockEvents: Event[] = [
     title: "Design Thinking Workshop",
     description:
       "Learn human-centered design methods through hands-on exercises and group activities.",
-    startTime: getDate(14, 13),
-    endTime: getEndDate(getDate(14, 13), 4),
+    startDay: 14,
+    startHour: 13,
+    durationHours: 4,
     location: "HCII, Room 3401",
     source: "HCII",
     format: "Workshop",
@@ -152,8 +167,9 @@ export const mockEvents: Event[] = [
     title: "CMU Spring Social Mixer",
     description:
       "Casual social event to meet students from different programs and network in a relaxed setting.",
-    startTime: getDate(15, 18),
-    endTime: getEndDate(getDate(15, 18), 3),
+    startDay: 15,
+    startHour: 18,
+    durationHours: 3,
     location: "University Center, Skibo Cafe",
     source: "University-wide",
     format: "Social",
@@ -165,8 +181,9 @@ export const mockEvents: Event[] = [
     title: "Product Management Bootcamp",
     description:
       "Intensive one-day bootcamp covering product strategy, roadmap planning, and stakeholder management.",
-    startTime: getDate(17, 9),
-    endTime: getEndDate(getDate(17, 9), 8),
+    startDay: 17,
+    startHour: 9,
+    durationHours: 8,
     location: "Tepper Quad, Room 4101",
     source: "Tepper",
     format: "Workshop",
@@ -179,8 +196,10 @@ export const mockEvents: Event[] = [
     title: "Healthcare Tech Innovation Hackathon",
     description:
       "48-hour hackathon focused on building solutions for healthcare challenges. Partnered with local hospitals.",
-    startTime: getDate(20, 9),
-    endTime: getDate(22, 18),
+    startDay: 20,
+    startHour: 9,
+    endDay: 22,
+    endHour: 18,
     location: "Heinz College",
     source: "Heinz",
     format: "Hackathon",
@@ -192,9 +211,11 @@ export const mockEvents: Event[] = [
   {
     id: "13",
     title: "ML Research Symposium",
-    description: "Annual symposium showcasing cutting-edge machine learning research from CMU faculty and students.",
-    startTime: getDate(-5, 10),
-    endTime: getEndDate(getDate(-5, 10), 6),
+    description:
+      "Annual symposium showcasing cutting-edge machine learning research from CMU faculty and students.",
+    startDay: -5,
+    startHour: 10,
+    durationHours: 6,
     location: "Gates Hillman Center, Auditorium",
     source: "SCS",
     format: "Talk",
@@ -204,9 +225,11 @@ export const mockEvents: Event[] = [
   {
     id: "14",
     title: "Dietrich College Research Showcase",
-    description: "Celebrate research achievements from across Dietrich College with poster presentations and talks.",
-    startTime: getDate(-10, 13),
-    endTime: getEndDate(getDate(-10, 13), 4),
+    description:
+      "Celebrate research achievements from across Dietrich College with poster presentations and talks.",
+    startDay: -10,
+    startHour: 13,
+    durationHours: 4,
     location: "Baker Hall",
     source: "Dietrich",
     format: "Social",
@@ -215,3 +238,35 @@ export const mockEvents: Event[] = [
   },
 ];
 
+function resolveSeed(seed: EventSeed, now: Date): Event {
+  const { startDay, startHour, endDay, endHour, durationHours, ...rest } = seed;
+
+  const start = new Date(now);
+  start.setDate(start.getDate() + startDay);
+  start.setHours(startHour, 0, 0, 0);
+
+  let end: Date;
+  if (endDay !== undefined) {
+    end = new Date(now);
+    end.setDate(end.getDate() + endDay);
+    end.setHours(endHour ?? 12, 0, 0, 0);
+  } else {
+    end = new Date(start);
+    end.setHours(end.getHours() + (durationHours ?? 2));
+  }
+
+  return {
+    ...rest,
+    startTime: start.toISOString(),
+    endTime: end.toISOString(),
+  };
+}
+
+/**
+ * Resolve the mock events relative to the supplied reference time (defaulting to
+ * the current moment). Call this on the client so seeded dates track the user's
+ * real "now".
+ */
+export function getMockEvents(now: Date = new Date()): Event[] {
+  return EVENT_SEEDS.map((seed) => resolveSeed(seed, now));
+}

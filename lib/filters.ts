@@ -1,12 +1,31 @@
-import { Event, EventSource, InterestTag, DateRangeFilter } from "@/types/events";
+import {
+  Event,
+  EventSource,
+  InterestTag,
+  DateRangeFilter,
+} from "@/types/events";
+import { isPastEvent } from "@/lib/formatters";
 
 /**
- * Pure filtering pipeline for events
- * Architecture: Easy to swap with API-level filtering later
+ * Pure filtering pipeline for events.
+ *
+ * All "is this happening in the window" decisions are based on the event's full
+ * [startTime, endTime] interval, and "past" is defined in exactly one place
+ * (isPastEvent, keyed off endTime) so an event that has started but not ended is
+ * consistently treated as current everywhere — in sorting, grouping, and badges.
+ * Architecture: easy to swap with API-level filtering later.
  */
 
+function startOfDay(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
 /**
- * Filter events by date range
+ * Filter events by date range.
+ *
+ * Windows are anchored to calendar boundaries (not rolling offsets) and matched
+ * by interval overlap, so a multi-day event that is currently in progress still
+ * appears under "Today"/"This Week"/"This Month".
  */
 export function filterByDateRange(
   events: Event[],
@@ -15,36 +34,40 @@ export function filterByDateRange(
   if (dateRange === "All") return events;
 
   const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const nextWeek = new Date(today);
-  nextWeek.setDate(nextWeek.getDate() + 7);
-  const nextMonth = new Date(today);
-  nextMonth.setMonth(nextMonth.getMonth() + 1);
+  const windowStart = startOfDay(now);
+  let windowEnd: Date;
+
+  switch (dateRange) {
+    case "Today":
+      windowEnd = new Date(windowStart);
+      windowEnd.setDate(windowEnd.getDate() + 1);
+      break;
+    case "This Week": {
+      // Through the end of the current calendar week (Saturday). getDay(): 0=Sun..6=Sat.
+      const daysUntilEndOfWeek = 6 - windowStart.getDay();
+      windowEnd = new Date(windowStart);
+      windowEnd.setDate(windowEnd.getDate() + daysUntilEndOfWeek + 1);
+      break;
+    }
+    case "This Month":
+      // First day of next month avoids the setMonth(+1) day-overflow bug.
+      windowEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+      break;
+    default:
+      return events;
+  }
 
   return events.filter((event) => {
-    const eventStart = new Date(event.startTime);
-
-    switch (dateRange) {
-      case "Today":
-        return (
-          eventStart >= today &&
-          eventStart < tomorrow
-        );
-      case "This Week":
-        return eventStart >= today && eventStart < nextWeek;
-      case "This Month":
-        return eventStart >= today && eventStart < nextMonth;
-      default:
-        return true;
-    }
+    const start = new Date(event.startTime);
+    const end = new Date(event.endTime);
+    // [start, end] overlaps [windowStart, windowEnd)
+    return start < windowEnd && end >= windowStart;
   });
 }
 
 /**
- * Filter events by source (host unit)
- * If no sources selected, show all (treat as "all selected")
+ * Filter events by source (host unit).
+ * If no sources selected, show all (treat as "all selected").
  */
 export function filterBySource(
   events: Event[],
@@ -55,8 +78,8 @@ export function filterBySource(
 }
 
 /**
- * Filter events by interest tags
- * Returns events where at least one interest tag matches user interests
+ * Filter events by interest tags.
+ * Returns events where at least one interest tag matches user interests.
  */
 export function filterByInterests(
   events: Event[],
@@ -71,7 +94,7 @@ export function filterByInterests(
 }
 
 /**
- * Search filter - case-insensitive search on title, description, hostOrgName
+ * Search filter - case-insensitive search on title, description, hostOrgName.
  */
 export function filterBySearch(events: Event[], searchQuery: string): Event[] {
   if (!searchQuery.trim()) return events;
@@ -86,31 +109,27 @@ export function filterBySearch(events: Event[], searchQuery: string): Event[] {
 }
 
 /**
- * Sort events: upcoming first (ascending by startTime), then past events
+ * Sort events: current/upcoming first (ascending by startTime), then past events
+ * (descending, most recently ended first). "Past" is endTime < now, matching
+ * isPastEvent, so an in-progress event keeps its place among the upcoming.
  */
 export function sortEvents(events: Event[]): Event[] {
-  const now = new Date();
-
-  const upcoming = events.filter(
-    (event) => new Date(event.startTime) >= now
-  );
-  const past = events.filter((event) => new Date(event.startTime) < now);
+  const upcoming = events.filter((event) => !isPastEvent(event.endTime));
+  const past = events.filter((event) => isPastEvent(event.endTime));
 
   upcoming.sort(
-    (a, b) =>
-      new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+    (a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
   );
   past.sort(
-    (a, b) =>
-      new Date(b.startTime).getTime() - new Date(a.startTime).getTime()
+    (a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime()
   );
 
   return [...upcoming, ...past];
 }
 
 /**
- * Apply all filters and sorting in sequence
- * This is the main filtering pipeline entry point
+ * Apply all filters and sorting in sequence.
+ * This is the main filtering pipeline entry point.
  */
 export function applyFilters(
   events: Event[],
@@ -136,4 +155,3 @@ export function applyFilters(
 
   return filtered;
 }
-

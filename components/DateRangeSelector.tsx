@@ -1,11 +1,11 @@
-import { DateRangeFilter } from "@/types/events";
+import { DateRangeFilter, DATE_RANGE_FILTERS } from "@/types/events";
 
 interface DateRangeSelectorProps {
   value: DateRangeFilter;
   onChange: (range: DateRangeFilter) => void;
 }
 
-const OPTIONS: DateRangeFilter[] = ["Today", "This Week", "This Month", "All"];
+const OPTIONS: readonly DateRangeFilter[] = DATE_RANGE_FILTERS;
 
 export default function DateRangeSelector({
   value,
@@ -28,7 +28,6 @@ export default function DateRangeSelector({
             }
           `}
           aria-pressed={value === option}
-          aria-label={`Filter events by ${option}`}
         >
           {option}
         </button>
@@ -36,4 +35,3 @@ export default function DateRangeSelector({
     </div>
   );
 }
-

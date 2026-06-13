@@ -1,10 +1,11 @@
 import { EventFormat } from "@/types/events";
 
 /**
- * Format date and time range for event display
+ * Format a date and time range for event display.
  * @param startTime ISO datetime string
  * @param endTime ISO datetime string
- * @returns Formatted string like "Thu, Nov 20 • 5:30–7:00 PM"
+ * @returns Same-day: "Thu, Nov 20 • 5:30–7:00 PM". Multi-day events include both
+ * dates: "Mon, Jun 15, 6:00 PM – Wed, Jun 17, 12:00 PM".
  */
 export function formatEventTimeRange(
   startTime: string,
@@ -13,22 +14,31 @@ export function formatEventTimeRange(
   const start = new Date(startTime);
   const end = new Date(endTime);
 
-  const dayName = start.toLocaleDateString("en-US", { weekday: "short" });
-  const month = start.toLocaleDateString("en-US", { month: "short" });
-  const day = start.getDate();
+  const dateLabel = (d: Date) =>
+    d.toLocaleDateString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+    });
+  const timeLabel = (d: Date) =>
+    d.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    });
 
-  const startTimeStr = start.toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-  });
-  const endTimeStr = end.toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-  });
+  const sameDay =
+    start.getFullYear() === end.getFullYear() &&
+    start.getMonth() === end.getMonth() &&
+    start.getDate() === end.getDate();
 
-  return `${dayName}, ${month} ${day} • ${startTimeStr}–${endTimeStr}`;
+  if (sameDay) {
+    return `${dateLabel(start)} • ${timeLabel(start)}–${timeLabel(end)}`;
+  }
+
+  // Multi-day events must show the end date, or the range reads as ending
+  // before it starts (e.g. a 42h hackathon "6:00 PM–12:00 PM").
+  return `${dateLabel(start)}, ${timeLabel(start)} – ${dateLabel(end)}, ${timeLabel(end)}`;
 }
 
 /**
@@ -64,7 +74,13 @@ export function getRelativeDateLabel(date: string): string {
   if (diffDays === 0) return "Today";
   if (diffDays === 1) return "Tomorrow";
   if (diffDays > 1 && diffDays <= 7) {
-    return eventDate.toLocaleDateString("en-US", { weekday: "long" });
+    // Weekday with date so two same-weekday groups in different weeks never
+    // collide and the label is unambiguous on its own ("Friday, Jun 19").
+    return eventDate.toLocaleDateString("en-US", {
+      weekday: "long",
+      month: "short",
+      day: "numeric",
+    });
   }
   return formatDate(date);
 }
@@ -94,7 +110,7 @@ export function isPastEvent(endTime: string): boolean {
 export function getFormatBadgeClasses(format: EventFormat): string {
   const baseClasses =
     "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium";
-  
+
   switch (format) {
     case "Hackathon":
       return `${baseClasses} bg-purple-100 text-purple-800`;
@@ -112,4 +128,3 @@ export function getFormatBadgeClasses(format: EventFormat): string {
       return `${baseClasses} bg-gray-100 text-gray-800`;
   }
 }
-

@@ -47,10 +47,17 @@ export default function FiltersPanel({
           </div>
 
           {/* Date Range */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
+          <div
+            className="space-y-2"
+            role="group"
+            aria-labelledby="date-range-label"
+          >
+            <span
+              id="date-range-label"
+              className="block text-sm font-medium text-gray-700"
+            >
               Date range:
-            </label>
+            </span>
             <DateRangeSelector value={dateRange} onChange={onDateRangeChange} />
           </div>
 
@@ -68,7 +75,7 @@ export default function FiltersPanel({
               checked={onlyShowInterests}
               onChange={(e) => onOnlyInterestsChange(e.target.checked)}
               className="
-                w-4 h-4 text-cmu-red border-gray-300 rounded
+                w-4 h-4 accent-cmu-red border-gray-300 rounded
                 focus:ring-cmu-red focus:ring-2
               "
             />
@@ -84,4 +91,3 @@ export default function FiltersPanel({
     </div>
   );
 }
-

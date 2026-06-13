@@ -1,18 +1,11 @@
-import { EventSource } from "@/types/events";
+import { EventSource, EVENT_SOURCES } from "@/types/events";
 
 interface SourceFilterProps {
   selectedSources: EventSource[];
   onChange: (sources: EventSource[]) => void;
 }
 
-const ALL_SOURCES: EventSource[] = [
-  "Tepper",
-  "Heinz",
-  "HCII",
-  "SCS",
-  "Dietrich",
-  "University-wide",
-];
+const ALL_SOURCES: readonly EventSource[] = EVENT_SOURCES;
 
 export default function SourceFilter({
   selectedSources,
@@ -27,10 +20,17 @@ export default function SourceFilter({
   };
 
   return (
-    <div className="space-y-2">
-      <label className="text-sm font-medium text-gray-700">
+    <div
+      className="space-y-2"
+      role="group"
+      aria-labelledby="source-filter-label"
+    >
+      <span
+        id="source-filter-label"
+        className="block text-sm font-medium text-gray-700"
+      >
         Filter by source:
-      </label>
+      </span>
       <div className="flex flex-wrap gap-2">
         {ALL_SOURCES.map((source) => {
           const isSelected = selectedSources.includes(source);
@@ -58,4 +58,3 @@ export default function SourceFilter({
     </div>
   );
 }
-

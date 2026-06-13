@@ -1,94 +1,109 @@
-import { InterestTag, EventSource, DateRangeFilter } from "@/types/events";
+import {
+  InterestTag,
+  EventSource,
+  DateRangeFilter,
+  isInterestTag,
+  isEventSource,
+  isDateRangeFilter,
+} from "@/types/events";
 
 const STORAGE_KEYS = {
   INTERESTS: "cmu-compass-interests",
   SOURCES: "cmu-compass-sources",
   DATE_RANGE: "cmu-compass-date-range",
   ONLY_INTERESTS: "cmu-compass-only-interests",
+  ONBOARDED: "cmu-compass-onboarded",
 } as const;
 
 /**
- * localStorage persistence utilities
- * To extend: Add new storage keys and getter/setter functions as needed
+ * localStorage persistence utilities.
+ *
+ * Reads are defensive: values that are absent, unparseable, the wrong shape, or
+ * no longer valid members of the domain vocabulary all fall back to safe
+ * defaults rather than flowing untyped into the app. This matters because the
+ * getters' declared return types would otherwise be satisfied by the `any` that
+ * `JSON.parse` produces, hiding corrupt or legacy data from the type checker.
  */
 
-export function saveInterests(interests: InterestTag[]): void {
-  if (typeof window !== "undefined") {
-    localStorage.setItem(STORAGE_KEYS.INTERESTS, JSON.stringify(interests));
+function readJson(key: string): unknown {
+  if (typeof window === "undefined") return undefined;
+  const stored = localStorage.getItem(key);
+  if (stored === null) return undefined;
+  try {
+    return JSON.parse(stored);
+  } catch {
+    return undefined;
   }
+}
+
+function writeJson(key: string, value: unknown): void {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(key, JSON.stringify(value));
+}
+
+export function saveInterests(interests: InterestTag[]): void {
+  writeJson(STORAGE_KEYS.INTERESTS, interests);
 }
 
 export function getInterests(): InterestTag[] {
-  if (typeof window !== "undefined") {
-    const stored = localStorage.getItem(STORAGE_KEYS.INTERESTS);
-    if (stored) {
-      try {
-        return JSON.parse(stored);
-      } catch {
-        return [];
-      }
-    }
-  }
-  return [];
+  const parsed = readJson(STORAGE_KEYS.INTERESTS);
+  if (!Array.isArray(parsed)) return [];
+  return parsed.filter(isInterestTag);
 }
 
 export function saveSources(sources: EventSource[]): void {
-  if (typeof window !== "undefined") {
-    localStorage.setItem(STORAGE_KEYS.SOURCES, JSON.stringify(sources));
-  }
+  writeJson(STORAGE_KEYS.SOURCES, sources);
 }
 
 export function getSources(): EventSource[] {
-  if (typeof window !== "undefined") {
-    const stored = localStorage.getItem(STORAGE_KEYS.SOURCES);
-    if (stored) {
-      try {
-        return JSON.parse(stored);
-      } catch {
-        return [];
-      }
-    }
-  }
-  return [];
+  const parsed = readJson(STORAGE_KEYS.SOURCES);
+  if (!Array.isArray(parsed)) return [];
+  return parsed.filter(isEventSource);
 }
 
 export function saveDateRange(dateRange: DateRangeFilter): void {
-  if (typeof window !== "undefined") {
-    localStorage.setItem(STORAGE_KEYS.DATE_RANGE, dateRange);
-  }
+  writeJson(STORAGE_KEYS.DATE_RANGE, dateRange);
 }
 
 export function getDateRange(): DateRangeFilter {
-  if (typeof window !== "undefined") {
-    const stored = localStorage.getItem(STORAGE_KEYS.DATE_RANGE);
-    if (stored && ["Today", "This Week", "This Month", "All"].includes(stored)) {
-      return stored as DateRangeFilter;
-    }
-  }
-  return "All";
+  const parsed = readJson(STORAGE_KEYS.DATE_RANGE);
+  return isDateRangeFilter(parsed) ? parsed : "All";
 }
 
 export function saveOnlyInterests(only: boolean): void {
-  if (typeof window !== "undefined") {
-    localStorage.setItem(STORAGE_KEYS.ONLY_INTERESTS, JSON.stringify(only));
-  }
+  writeJson(STORAGE_KEYS.ONLY_INTERESTS, only);
 }
 
 export function getOnlyInterests(): boolean {
-  if (typeof window !== "undefined") {
-    const stored = localStorage.getItem(STORAGE_KEYS.ONLY_INTERESTS);
-    if (stored) {
-      try {
-        return JSON.parse(stored);
-      } catch {
-        return false;
-      }
-    }
-  }
-  return false;
+  const parsed = readJson(STORAGE_KEYS.ONLY_INTERESTS);
+  return typeof parsed === "boolean" ? parsed : false;
 }
 
+/**
+ * Whether the user has completed (or skipped) onboarding. Tracked with an
+ * explicit flag rather than inferred from whether interests exist, so a user who
+ * dismisses onboarding without picking an interest is not re-prompted forever.
+ */
+export function saveOnboarded(onboarded: boolean): void {
+  writeJson(STORAGE_KEYS.ONBOARDED, onboarded);
+}
+
+export function getOnboarded(): boolean {
+  const parsed = readJson(STORAGE_KEYS.ONBOARDED);
+  return typeof parsed === "boolean" ? parsed : false;
+}
+
+/**
+ * True if the user has any persisted signal — an explicit onboarding flag or any
+ * saved preference. Used as a fallback for users who set filters before the
+ * onboarding flag existed.
+ */
 export function hasSavedPreferences(): boolean {
-  return getInterests().length > 0;
+  return (
+    getOnboarded() ||
+    getInterests().length > 0 ||
+    getSources().length > 0 ||
+    getDateRange() !== "All" ||
+    getOnlyInterests()
+  );
 }
-

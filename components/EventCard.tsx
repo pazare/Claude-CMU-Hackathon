@@ -13,26 +13,22 @@ interface EventCardProps {
 export default function EventCard({ event }: EventCardProps) {
   const isPast = isPastEvent(event.endTime);
   const happeningSoon = isHappeningSoon(event.startTime);
+  // Defend against duplicate tags from future (API) data so React keys stay unique.
+  const interestTags = Array.from(new Set(event.interestTags));
 
   return (
     <div
       className={`
-        rounded-xl shadow-sm p-4 md:p-5 bg-white border border-gray-200
+        rounded-xl shadow-sm p-4 md:p-5 border border-gray-200
         transition-all duration-200
         hover:shadow-md hover:-translate-y-0.5
-        ${isPast ? "opacity-60" : ""}
+        ${isPast ? "bg-gray-50" : "bg-white"}
       `}
     >
       <div className="flex flex-col gap-3">
         {/* Header: Title and Format Badge */}
         <div className="flex items-start justify-between gap-3">
-          <h3
-            className={`
-              text-base md:text-lg font-semibold text-gray-900
-              ${!isPast ? "hover:text-cmu-red transition-colors cursor-pointer" : "text-gray-400"}
-              flex-1
-            `}
-          >
+          <h3 className="text-base md:text-lg font-semibold text-gray-900 flex-1">
             {event.title}
           </h3>
           <span className={getFormatBadgeClasses(event.format)}>
@@ -42,13 +38,15 @@ export default function EventCard({ event }: EventCardProps) {
 
         {/* Source and Host */}
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs font-medium uppercase tracking-wide text-gray-500">
+          <span className="text-xs font-medium uppercase tracking-wide text-gray-600">
             {event.source}
           </span>
           {event.hostOrgName && (
             <>
-              <span className="text-xs text-gray-400">•</span>
-              <span className="text-xs text-gray-500">{event.hostOrgName}</span>
+              <span className="text-xs text-gray-400" aria-hidden="true">
+                •
+              </span>
+              <span className="text-xs text-gray-600">{event.hostOrgName}</span>
             </>
           )}
         </div>
@@ -57,10 +55,11 @@ export default function EventCard({ event }: EventCardProps) {
         <div className="flex flex-col gap-1 text-sm text-gray-700">
           <div className="flex items-center gap-2">
             <svg
-              className="w-4 h-4 text-gray-400"
+              className="w-4 h-4 text-gray-500"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
+              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"
@@ -69,16 +68,15 @@ export default function EventCard({ event }: EventCardProps) {
                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
               />
             </svg>
-            <span className={isPast ? "text-gray-400" : ""}>
-              {formatEventTimeRange(event.startTime, event.endTime)}
-            </span>
+            <span>{formatEventTimeRange(event.startTime, event.endTime)}</span>
           </div>
           <div className="flex items-center gap-2">
             <svg
-              className="w-4 h-4 text-gray-400"
+              className="w-4 h-4 text-gray-500"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
+              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"
@@ -93,19 +91,19 @@ export default function EventCard({ event }: EventCardProps) {
                 d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
               />
             </svg>
-            <span className={isPast ? "text-gray-400" : ""}>{event.location}</span>
+            <span>{event.location}</span>
           </div>
         </div>
 
         {/* Description */}
-        <p className={`text-sm md:text-base ${isPast ? "text-gray-400" : "text-gray-700"}`}>
+        <p className="text-sm md:text-base text-gray-700">
           {event.description}
         </p>
 
         {/* Interest Tags */}
-        {event.interestTags.length > 0 && (
+        {interestTags.length > 0 && (
           <div className="flex flex-wrap gap-2">
-            {event.interestTags.map((tag) => (
+            {interestTags.map((tag) => (
               <span
                 key={tag}
                 className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-gray-100 text-gray-700"
@@ -125,7 +123,9 @@ export default function EventCard({ event }: EventCardProps) {
               </span>
             )}
             {isPast && (
-              <span className="text-xs text-gray-400">Past event</span>
+              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-700">
+                Past event
+              </span>
             )}
           </div>
           {event.rsvpUrl && !isPast && (
@@ -139,7 +139,6 @@ export default function EventCard({ event }: EventCardProps) {
                 hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-cmu-red focus:ring-offset-2
                 transition-colors
               "
-              onClick={(e) => e.stopPropagation()}
             >
               RSVP
               <svg
@@ -147,6 +146,7 @@ export default function EventCard({ event }: EventCardProps) {
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
+                aria-hidden="true"
               >
                 <path
                   strokeLinecap="round"
@@ -162,4 +162,3 @@ export default function EventCard({ event }: EventCardProps) {
     </div>
   );
 }
-

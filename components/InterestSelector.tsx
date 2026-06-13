@@ -1,4 +1,4 @@
-import { InterestTag } from "@/types/events";
+import { InterestTag, INTEREST_TAGS } from "@/types/events";
 
 interface InterestSelectorProps {
   selectedInterests: InterestTag[];
@@ -6,17 +6,7 @@ interface InterestSelectorProps {
   compact?: boolean;
 }
 
-const ALL_INTERESTS: InterestTag[] = [
-  "AI / ML",
-  "HCI / Design",
-  "Entrepreneurship",
-  "Healthcare",
-  "Policy & Society",
-  "Data Science",
-  "Product Management",
-  "Robotics",
-  "General",
-];
+const ALL_INTERESTS: readonly InterestTag[] = INTEREST_TAGS;
 
 export default function InterestSelector({
   selectedInterests,
@@ -56,7 +46,7 @@ export default function InterestSelector({
           })}
         </div>
         <p className="text-xs text-gray-500">
-          We'll prioritize events that match these interests.
+          We&apos;ll prioritize events that match these interests.
         </p>
       </div>
     );
@@ -70,7 +60,7 @@ export default function InterestSelector({
             Your Interests
           </h3>
           <p className="text-xs text-gray-500 mt-1">
-            We'll prioritize events that match these interests.
+            We&apos;ll prioritize events that match these interests.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -101,4 +91,3 @@ export default function InterestSelector({
     </div>
   );
 }
-
