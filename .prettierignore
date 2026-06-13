@@ -1,0 +1,10 @@
+node_modules
+.next
+out
+coverage
+package-lock.json
+*.tsbuildinfo
+
+# Large self-contained static artifacts with bespoke formatting.
+index.html
+pitch.html
