@@ -13,7 +13,7 @@ import { Event } from "@/types/events";
 type EventSeed = Omit<Event, "startTime" | "endTime"> & {
   /** Day offset from today for the event start (negative = past). */
   startDay: number;
-  /** Hour of day (0–23) for the event start. */
+  /** Hour of day (0 to 23) for the event start. */
   startHour: number;
   /** Day offset for the end, for multi-day events. Defaults to startDay. */
   endDay?: number;
@@ -29,7 +29,7 @@ const EVENT_SEEDS: EventSeed[] = [
     id: "1",
     title: "AI & Machine Learning Research Talk",
     description:
-      "Join us for an exciting talk on the latest developments in deep learning and neural networks, featuring guest speakers from industry.",
+      "A talk on recent developments in deep learning and neural networks, with guest speakers from industry.",
     startDay: 0,
     startHour: 14,
     durationHours: 2,
@@ -60,7 +60,7 @@ const EVENT_SEEDS: EventSeed[] = [
     id: "3",
     title: "CMU TartanHacks 2026",
     description:
-      "Annual 36-hour hackathon bringing together students from across CMU to build innovative projects. Prizes, mentorship, and free food!",
+      "Annual 36-hour hackathon where students from across CMU build projects together. Prizes, mentorship, and free food.",
     startDay: 2,
     startHour: 18,
     endDay: 4,
@@ -137,7 +137,7 @@ const EVENT_SEEDS: EventSeed[] = [
     id: "8",
     title: "Robotics Lab Open House",
     description:
-      "Tour the robotics lab, see demos of cutting-edge robots, and chat with researchers about ongoing projects.",
+      "Tour the robotics lab, see robot demos, and talk with researchers about ongoing projects.",
     startDay: 12,
     startHour: 14,
     durationHours: 3,
@@ -212,7 +212,7 @@ const EVENT_SEEDS: EventSeed[] = [
     id: "13",
     title: "ML Research Symposium",
     description:
-      "Annual symposium showcasing cutting-edge machine learning research from CMU faculty and students.",
+      "Annual symposium showcasing recent machine learning research from CMU faculty and students.",
     startDay: -5,
     startHour: 10,
     durationHours: 6,

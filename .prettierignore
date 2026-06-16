@@ -6,5 +6,5 @@ package-lock.json
 *.tsbuildinfo
 
 # Large self-contained static artifacts with bespoke formatting.
-index.html
-pitch.html
+public/mock.html
+public/pitch.html

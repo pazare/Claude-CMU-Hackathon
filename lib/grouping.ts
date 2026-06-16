@@ -1,13 +1,10 @@
 import { Event } from "@/types/events";
 import { getRelativeDateLabel, isPastEvent } from "@/lib/formatters";
+import { startOfDay } from "@/lib/date";
 
 export interface EventGroup {
   label: string;
   events: Event[];
-}
-
-function startOfDay(date: Date): Date {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }
 
 /**
@@ -16,7 +13,7 @@ function startOfDay(date: Date): Date {
  * Upcoming day-groups run earliest-first; any fully-past day-groups follow
  * (most recent first). An event that started before today but has not yet ended
  * is treated as happening "Today", so a currently-running multi-day event
- * surfaces at the top instead of under a stale past-dated header — consistent
+ * surfaces at the top instead of under a stale past-dated header, consistent
  * with the single "past = ended" definition used everywhere else.
  *
  * Each group carries a representative day derived from the grouping decision (not

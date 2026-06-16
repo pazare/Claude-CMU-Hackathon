@@ -94,7 +94,7 @@ export function getOnboarded(): boolean {
 }
 
 /**
- * True if the user has any persisted signal — an explicit onboarding flag or any
+ * True if the user has any persisted signal, an explicit onboarding flag or any
  * saved preference. Used as a fallback for users who set filters before the
  * onboarding flag existed.
  */

@@ -30,7 +30,7 @@ import OnboardingCard from "@/components/OnboardingCard";
 import EmptyState from "@/components/EmptyState";
 
 // TODO: Replace getMockEvents() with real API calls.
-// Architecture: easy to swap data source — replace getMockEvents with a function
+// Architecture: easy to swap data source. Replace getMockEvents with a function
 // that fetches from APIs or parses ICS feeds and returns Event[].
 
 export default function Home() {
@@ -157,14 +157,24 @@ export default function Home() {
 
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <h1 className="text-2xl md:text-3xl font-semibold text-gray-900">
-            CMU Event Compass
-          </h1>
-          <p className="text-sm md:text-base text-gray-600 mt-1">
-            See hackathons, talks, and competitions across CMU in one place.
-          </p>
-          <p className="text-xs text-gray-500 mt-2">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+          <div className="flex items-center gap-3">
+            <span
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-cmu-red text-sm font-bold text-white"
+              aria-hidden="true"
+            >
+              EC
+            </span>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-semibold text-gray-900">
+                CMU Event Compass
+              </h1>
+              <p className="text-sm md:text-base text-gray-600">
+                See hackathons, talks, and competitions across CMU in one place.
+              </p>
+            </div>
+          </div>
+          <p className="mt-2 text-xs text-gray-500">
             Data is currently mocked; ready to connect to real feeds later.
           </p>
         </div>

@@ -5,6 +5,7 @@ import {
   DateRangeFilter,
 } from "@/types/events";
 import { isPastEvent } from "@/lib/formatters";
+import { startOfDay } from "@/lib/date";
 
 /**
  * Pure filtering pipeline for events.
@@ -12,13 +13,9 @@ import { isPastEvent } from "@/lib/formatters";
  * All "is this happening in the window" decisions are based on the event's full
  * [startTime, endTime] interval, and "past" is defined in exactly one place
  * (isPastEvent, keyed off endTime) so an event that has started but not ended is
- * consistently treated as current everywhere — in sorting, grouping, and badges.
+ * consistently treated as current everywhere, in sorting, grouping, and badges.
  * Architecture: easy to swap with API-level filtering later.
  */
-
-function startOfDay(date: Date): Date {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-}
 
 /**
  * Filter events by date range.

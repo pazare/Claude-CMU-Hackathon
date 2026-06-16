@@ -1,81 +1,76 @@
 # CMU Event Compass
 
-A hackathon prototype that unifies CMU event discovery into one personalized feed. Built with Claude at a CMU hackathon in November 2025.
+CMU Event Compass puts events from across Carnegie Mellon into one feed and lets students filter to the ones they care about. Heinz, Tepper, SCS, HCII, Dietrich, and university-wide calendars all publish separately today, so students piece together what is happening from newsletters, Slack, Discord, and flyers. The result is missed events and decision fatigue. This prototype shows what one personalized feed could look like.
+
+Built with Claude at the CMU Claude Hackathon in November 2025.
 
 **Live demo:** https://pazare.github.io/Claude-CMU-Hackathon/
 **Pitch deck:** https://pazare.github.io/Claude-CMU-Hackathon/pitch.html
 
-![CMU Event Compass home feed — the static demo served by the live link above](docs/screenshot.png)
+![CMU Event Compass: the live Next.js app](docs/screenshot.png)
 
-## The problem
-
-CMU events live in silos. Heinz, Tepper, SCS, HCII, Dietrich, and university-wide calendars each publish separately, and students discover events through a mix of newsletters, Discord, Slack, and flyers. The result is decision fatigue, missed opportunities, and calendars that never reflect what is actually happening on campus.
+The live demo is the real Next.js app, exported as a static site and deployed to GitHub Pages. The original static design mock is kept at https://pazare.github.io/Claude-CMU-Hackathon/mock.html.
 
 ## What it does
 
-Event Compass puts every school's events in one feed and lets students filter by what they care about:
+- **Interest filtering.** Pick tags such as AI / ML, HCI / Design, Entrepreneurship, Healthcare, Policy & Society, Data Science, Product Management, and Robotics. Turn on "Only show my interests" to narrow the feed to matching events.
+- **Multi-source aggregation.** Events from Heinz, Tepper, SCS, HCII, Dietrich, and university-wide calendars appear in a single list.
+- **Date, source, and search filters.** Limit to Today, This Week, or This Month, filter by source unit, and run a free-text search over titles, descriptions, and host organizations. Filters combine.
+- **Day grouping.** Events group by day, upcoming first, with in-progress and past events handled correctly.
+- **Persistent preferences.** Interests, selected sources, date range, and the "Only show my interests" toggle save to localStorage, so the feed stays personalized between visits.
+- **Onboarding.** First-time visitors pick interests once; returning visitors skip straight to their feed.
 
-- **Interest-based filtering** with tags like AI / ML, HCI, entrepreneurship, policy, data science, healthcare, and robotics
-- **Multi-source aggregation** across Heinz, Tepper, SCS, HCII, Dietrich, and university-wide calendars
-- **Date, format, and source filters** plus free-text search
-- **Persistent preferences** saved locally, so the feed stays personalized between visits
-
-The pitch deck extends the concept to a calendar add-on: students set interests once, and the upcoming week's matching events sync to Google or Apple Calendar as a single subscription instead of one-by-one manual entry.
-
-## What is in this repo
-
-Three artifacts from the hackathon day:
-
-| Path                                             | What it is                                                                                                                         |
-| ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `index.html`                                     | Static high-fidelity mock of the home feed. This is what the live demo serves.                                                     |
-| `pitch.html`                                     | Six-slide pitch deck for the calendar add-on concept, built as a standalone page.                                                  |
-| `app/`, `components/`, `lib/`, `data/`, `types/` | Working Next.js 14 + TypeScript prototype of the same design, with functional filtering, onboarding, and localStorage persistence. |
-
-## Running the Next.js prototype
+## Run it
 
 ```bash
-npm install
-npm run dev
+npm install && npm run dev
 ```
 
-Then open http://localhost:3000. The static demo and pitch deck need only a browser.
+Then open http://localhost:3000.
 
-## Development
-
-The prototype is set up with the checks you would expect on a real project:
+Other commands:
 
 ```bash
-npm run typecheck   # tsc --noEmit
-npm run lint        # next lint (next/core-web-vitals)
-npm run format:check # prettier
-npm test            # vitest (lib filters/formatters/storage + component tests)
-npm run build       # production build
+npm run typecheck     # tsc --noEmit
+npm run lint          # next lint
+npm run format        # prettier --write
+npm run format:check  # prettier --check
+npm test              # vitest
+npm run build         # production build
 ```
 
-The pure logic in `lib/` and the localStorage layer are covered by a Vitest
-suite (run with a pinned clock so the date-relative tests are deterministic).
-A GitHub Actions workflow (`.github/workflows/ci.yml`) runs typecheck, lint,
-format check, tests, and build on every push and pull request.
+## How it is built
+
+Next.js 14 (App Router), React 18, and TypeScript in strict mode, styled with Tailwind CSS. Tests run on Vitest, with ESLint and Prettier for linting and formatting. The filtering and storage logic lives in plain functions in `lib/` and is unit tested with a pinned clock so the date-relative cases stay deterministic.
+
+GitHub Actions runs typecheck, lint, format check, tests, and build on every push and pull request. A separate workflow deploys the static export to GitHub Pages.
+
+Repo layout:
+
+| Path                                             | What it is                                                        |
+| ------------------------------------------------ | ----------------------------------------------------------------- |
+| `app/`, `components/`, `lib/`, `data/`, `types/` | The Next.js + TypeScript app: filtering, onboarding, persistence. |
+| `public/mock.html`                               | The original static high-fidelity design mock.                    |
+| `public/pitch.html`                              | The six-slide pitch deck.                                         |
+| `*.test.ts(x)`                                   | Vitest unit and component tests.                                  |
 
 ## How Claude was used
 
-Claude generated and iterated on all three artifacts during the hackathon: the static mock, the pitch deck, and the Next.js implementation. Human direction covered product scope, the unification concept, information architecture, and CMU-specific details such as schools, venues, and event types.
+Claude generated and iterated on all three artifacts (static mock, pitch deck, Next.js app) during the hackathon; human direction covered product scope, the unification concept, information architecture, and CMU-specific details such as schools, venues, and event types.
 
-## Honest limitations
+## What this is
 
-This is a one-day hackathon prototype, not a production system:
+A one-day hackathon prototype, not a production system.
 
-- Event data is mock data in `data/events.ts`. There is no live integration with CMU calendar feeds yet.
-- The static mock and the Next.js app are parallel implementations of the same design (each with its own sample data), not a single codebase.
-- Preferences live in localStorage only. There are no accounts and no backend.
+- Event data is mock data in `data/events.ts`, seeded as offsets from "now" so Today and This Week stay correct. There is no live CMU feed integration yet.
+- Preferences persist in localStorage only. There are no accounts and no backend.
 
 ## Roadmap to a real product
 
-1. Replace mock data with real sources, parsing ICS feeds or scraping the public calendars of each school.
-2. Ship the calendar subscription described in the pitch deck, generating a per-student ICS feed.
-3. Add lightweight preference learning so the ranking improves as students accept or skip events.
+1. Replace mock data with real sources by parsing ICS feeds or the public calendars of each school.
+2. Ship the calendar subscription from the pitch deck: set interests once and subscribe to a per-student feed of matching events in Google or Apple Calendar.
+3. Add lightweight preference learning so ranking improves as students accept or skip events.
 
 ## License
 
-MIT. See `LICENSE`.
+MIT. See LICENSE.

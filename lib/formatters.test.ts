@@ -43,7 +43,7 @@ describe("formatEventTimeRange", () => {
       "2026-06-15T19:00:00"
     );
     expect(out).toContain("•");
-    expect(out).toContain("–");
+    expect(out).toContain(" to ");
   });
 
   it("includes the end date for a multi-day event", () => {

@@ -4,8 +4,8 @@ import { EventFormat } from "@/types/events";
  * Format a date and time range for event display.
  * @param startTime ISO datetime string
  * @param endTime ISO datetime string
- * @returns Same-day: "Thu, Nov 20 • 5:30–7:00 PM". Multi-day events include both
- * dates: "Mon, Jun 15, 6:00 PM – Wed, Jun 17, 12:00 PM".
+ * @returns Same-day: "Thu, Nov 20 • 5:30 PM to 7:00 PM". Multi-day events
+ * include both dates: "Mon, Jun 15, 6:00 PM to Wed, Jun 17, 12:00 PM".
  */
 export function formatEventTimeRange(
   startTime: string,
@@ -33,12 +33,12 @@ export function formatEventTimeRange(
     start.getDate() === end.getDate();
 
   if (sameDay) {
-    return `${dateLabel(start)} • ${timeLabel(start)}–${timeLabel(end)}`;
+    return `${dateLabel(start)} • ${timeLabel(start)} to ${timeLabel(end)}`;
   }
 
   // Multi-day events must show the end date, or the range reads as ending
-  // before it starts (e.g. a 42h hackathon "6:00 PM–12:00 PM").
-  return `${dateLabel(start)}, ${timeLabel(start)} – ${dateLabel(end)}, ${timeLabel(end)}`;
+  // before it starts (e.g. a 42h hackathon "6:00 PM to 12:00 PM").
+  return `${dateLabel(start)}, ${timeLabel(start)} to ${dateLabel(end)}, ${timeLabel(end)}`;
 }
 
 /**
