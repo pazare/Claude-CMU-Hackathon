@@ -69,7 +69,7 @@ function instruction(location: string, width: number, height: number): string {
     "For each, give a short title, the best-fitting category, and a one or two sentence plain-language summary.",
     "Include whichever of these are printed: date or time, location, hosting organization, contact (email, phone, link, or social handle), price (for items for sale), compensation (for research studies or jobs).",
     "Add 2 to 5 lowercase topical tags.",
-    "Also give box: the flyer's bounding rectangle in pixels, where x and y are the top-left corner and w and h the width and height, with the origin at the top-left of the image.",
+    "Also give box: the flyer's bounding rectangle in pixels, where x and y are the top-left corner and w and h the width and height, with the origin at the top-left of the image. Make each box tight around a single flyer, and do not let boxes overlap or merge neighbouring flyers.",
     "Skip anything you cannot read.",
   ].join(" ");
 }
@@ -166,17 +166,24 @@ export async function extractPostings(
 
   const items = parseExtraction(text, opts.muralId);
 
-  // Crop each located flyer out of the photo. If a box is missing or the crop
-  // fails, the posting keeps no image and the text tile shows instead.
-  const { width, height } = opts.image;
+  // Crop each located flyer out of the high-resolution copy. Boxes are in the
+  // sent image's pixel space, so scale them up to the full image first. If a box
+  // is missing or the crop fails, the posting keeps no image and the text tile
+  // shows instead.
+  const sentW = opts.image.width;
+  const sentH = opts.image.height;
+  const scale = opts.image.full.width / sentW;
   return Promise.all(
     items.map(async ({ posting, box }) => {
       if (!box) return posting;
       try {
-        posting.image = await cropToDataUrl(
-          opts.image,
-          denormalizeBox(box, width, height)
-        );
+        const sent = denormalizeBox(box, sentW, sentH);
+        posting.image = await cropToDataUrl(opts.image.full, {
+          x: sent.x * scale,
+          y: sent.y * scale,
+          w: sent.w * scale,
+          h: sent.h * scale,
+        });
       } catch {
         // Leave image undefined.
       }

@@ -16,7 +16,7 @@ The live demo is the real Next.js app, exported as a static site and deployed to
 ## How it works
 
 1. **Scan.** Upload or photograph a poster wall, and tag it with a location and date.
-2. **Extract.** Claude vision reads the photo and returns one structured listing per flyer: a title, a category, a short summary, and whatever the flyer prints (time, place, contact, price, compensation, tags). It also returns each flyer's bounding box, so the app crops the real poster out of your photo.
+2. **Extract.** Claude vision reads the photo and returns one structured listing per flyer: a title, a category, a short summary, and whatever the flyer prints (time, place, contact, price, compensation, tags). It also returns each flyer's bounding box, so the app crops the real poster out of a high-resolution copy of your photo and keeps it sharp.
 3. **Rank.** A local heuristic orders the postings by your chosen interests. This runs entirely in your browser: no API call, no cost, and deterministic.
 4. **Swipe.** Go through the deck and swipe right to keep a flyer, left to skip it. Drag, buttons, and the arrow keys all work.
 5. **Your mural.** The flyers you keep become a personalized board of the real posters, pinned and laid out like a corkboard.
@@ -28,6 +28,10 @@ A secondary **Browse** tab keeps the earlier idea: a filterable, cross-CMU event
 The extraction calls the Claude [Messages API](https://docs.claude.com/en/api/messages) directly from the browser. It sends the photo as an image and uses [structured outputs](https://docs.claude.com/en/docs/build-with-claude/structured-outputs) (a JSON schema) so each flyer comes back as a typed object, including the bounding box used for cropping. The default model is Claude Opus 4.8 (`claude-opus-4-8`), with Sonnet 4.6 and Haiku 4.5 as cheaper options in Settings.
 
 Because the app is a static site with no backend, it uses your own Anthropic API key. The key is stored only in your browser, sent only to the Anthropic API, and never committed. Get one at [console.anthropic.com](https://console.anthropic.com) and paste it into Settings. The sample board runs without a key.
+
+### Optional: recreate a poster with OpenAI
+
+If a crop comes out blurry or skewed, add an OpenAI key in Settings and tap **Recreate** on that poster in your mural. The app sends the crop to OpenAI's image model (`gpt-image-1`) with a prompt to reproduce the flyer faithfully, and swaps in the clean redraw. It runs one poster at a time and is entirely optional; the real crop is the default. The recreate is a faithful redraw, not a pixel copy, and the OpenAI key (like the Anthropic one) stays in your browser.
 
 ## Run it
 

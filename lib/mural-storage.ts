@@ -12,6 +12,7 @@ import { ExtractionModelId, DEFAULT_MODEL } from "@/lib/extract";
 
 const KEYS = {
   API_KEY: "compass-api-key",
+  OPENAI_KEY: "compass-openai-key",
   MODEL: "compass-model",
   POSTINGS: "compass-postings",
   SAVED: "compass-saved",
@@ -54,6 +55,17 @@ export function saveApiKey(key: string): void {
 export function clearApiKey(): void {
   if (typeof window === "undefined") return;
   localStorage.removeItem(KEYS.API_KEY);
+}
+
+// Optional OpenAI key, used only to recreate posters on demand.
+export function getOpenaiKey(): string {
+  if (typeof window === "undefined") return "";
+  return localStorage.getItem(KEYS.OPENAI_KEY) ?? "";
+}
+export function saveOpenaiKey(key: string): void {
+  if (typeof window === "undefined") return;
+  if (key) localStorage.setItem(KEYS.OPENAI_KEY, key);
+  else localStorage.removeItem(KEYS.OPENAI_KEY);
 }
 
 // Model choice.

@@ -5,6 +5,7 @@ import { Posting, MuralScan } from "@/types/postings";
 import { InterestTag } from "@/types/events";
 import { ExtractionModelId } from "@/lib/extract";
 import { rankPostings } from "@/lib/ranker";
+import { recreatePoster } from "@/lib/recreate";
 import { SAMPLE_POSTINGS } from "@/data/sample-mural";
 import { getInterests, saveInterests } from "@/lib/storage";
 import {
@@ -25,12 +26,14 @@ type SubView = "scan" | "swipe" | "saved";
 
 interface MuralAppProps {
   apiKey: string;
+  openaiKey: string;
   model: ExtractionModelId;
   onOpenSettings: () => void;
 }
 
 export default function MuralApp({
   apiKey,
+  openaiKey,
   model,
   onOpenSettings,
 }: MuralAppProps) {
@@ -116,6 +119,17 @@ export default function MuralApp({
     setSavedIds((prev) => prev.filter((s) => s !== id));
   }
 
+  /** Recreate one poster with OpenAI and swap in the result. Throws on failure. */
+  async function handleRecreate(posting: Posting) {
+    if (!openaiKey || !posting.image) return;
+    const image = await recreatePoster(posting.image, posting, openaiKey);
+    const updated = postings.map((p) =>
+      p.id === posting.id ? { ...p, image } : p
+    );
+    setPostings(updated);
+    savePostings(updated);
+  }
+
   if (!hydrated) {
     return (
       <p className="text-sm text-gray-500" role="status">
@@ -196,6 +210,8 @@ export default function MuralApp({
           postings={savedPostings}
           onRemove={handleRemoveSaved}
           onScan={() => setView("scan")}
+          canRecreate={Boolean(openaiKey)}
+          onRecreate={handleRecreate}
         />
       )}
     </div>

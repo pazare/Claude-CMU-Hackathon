@@ -5,6 +5,8 @@ import { ExtractionModelId } from "@/lib/extract";
 import {
   getApiKey,
   saveApiKey,
+  getOpenaiKey,
+  saveOpenaiKey,
   getModel,
   saveModel,
 } from "@/lib/mural-storage";
@@ -23,17 +25,25 @@ export default function Home() {
   const [tab, setTab] = useState<Tab>("mural");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [apiKey, setApiKey] = useState("");
+  const [openaiKey, setOpenaiKey] = useState("");
   const [model, setModel] = useState<ExtractionModelId>("claude-opus-4-8");
 
-  // Read the key and model on the client (localStorage is unavailable on render).
+  // Read the keys and model on the client (localStorage is unavailable on render).
   useEffect(() => {
     setApiKey(getApiKey());
+    setOpenaiKey(getOpenaiKey());
     setModel(getModel());
   }, []);
 
-  function handleSaveSettings(key: string, nextModel: ExtractionModelId) {
+  function handleSaveSettings(
+    key: string,
+    openai: string,
+    nextModel: ExtractionModelId
+  ) {
     setApiKey(key);
     saveApiKey(key);
+    setOpenaiKey(openai);
+    saveOpenaiKey(openai);
     setModel(nextModel);
     saveModel(nextModel);
   }
@@ -99,6 +109,7 @@ export default function Home() {
         <div className={tab === "mural" ? "" : "hidden"}>
           <MuralApp
             apiKey={apiKey}
+            openaiKey={openaiKey}
             model={model}
             onOpenSettings={() => setSettingsOpen(true)}
           />
@@ -112,6 +123,7 @@ export default function Home() {
         open={settingsOpen}
         onClose={() => setSettingsOpen(false)}
         apiKey={apiKey}
+        openaiKey={openaiKey}
         model={model}
         onSave={handleSaveSettings}
       />

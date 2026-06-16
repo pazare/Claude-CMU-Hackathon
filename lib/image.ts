@@ -1,11 +1,12 @@
 // Browser-only helpers for preparing a photo and cropping flyers out of it.
 
 export interface PreparedImage {
-  base64: string; // raw base64, no data: prefix (sent to the API)
+  base64: string; // downscaled JPEG sent to the API (cheaper, fast to detect on)
   mediaType: "image/jpeg";
-  dataUrl: string; // full data URL, kept so we can crop regions out of it
-  width: number;
+  width: number; // dimensions of the sent image (the box coordinate space)
   height: number;
+  /** A higher-resolution copy kept for sharp crops of each real poster. */
+  full: { dataUrl: string; width: number; height: number };
 }
 
 export interface Box {
@@ -15,52 +16,68 @@ export interface Box {
   h: number;
 }
 
-const MAX_EDGE = 2000; // long-edge cap: keeps small poster text legible without huge token cost
+const SENT_EDGE = 2000; // long-edge cap for the image Claude sees
+const FULL_EDGE = 3200; // long-edge cap for the copy we crop from
 
-/**
- * Load a File, downscale so the long edge is at most MAX_EDGE, and re-encode as
- * JPEG. Returns the base64 for the API plus the data URL and pixel dimensions so
- * Claude's bounding boxes (in this image's pixel space) can be cropped later.
- */
-export async function fileToImage(file: File): Promise<PreparedImage> {
-  const sourceUrl = await readAsDataUrl(file);
-  const img = await loadImage(sourceUrl);
+interface Scaled {
+  dataUrl: string;
+  base64: string;
+  width: number;
+  height: number;
+}
 
-  const scale = Math.min(1, MAX_EDGE / Math.max(img.width, img.height));
+function scaleToCanvas(
+  img: HTMLImageElement,
+  maxEdge: number,
+  quality: number
+): Scaled {
+  const scale = Math.min(1, maxEdge / Math.max(img.width, img.height));
   const width = Math.max(1, Math.round(img.width * scale));
   const height = Math.max(1, Math.round(img.height * scale));
-
   const canvas = document.createElement("canvas");
   canvas.width = width;
   canvas.height = height;
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Could not read the image in this browser.");
   ctx.drawImage(img, 0, 0, width, height);
+  const dataUrl = canvas.toDataURL("image/jpeg", quality);
+  return { dataUrl, base64: dataUrl.split(",")[1] ?? "", width, height };
+}
 
-  const dataUrl = canvas.toDataURL("image/jpeg", 0.9);
+/**
+ * Load a File and produce two JPEGs: a lighter one for Claude to detect flyers on
+ * (its pixel space is where bounding boxes live), and a higher-resolution one kept
+ * for sharp crops of each poster.
+ */
+export async function fileToImage(file: File): Promise<PreparedImage> {
+  const sourceUrl = await readAsDataUrl(file);
+  const img = await loadImage(sourceUrl);
+  const sent = scaleToCanvas(img, SENT_EDGE, 0.9);
+  const full = scaleToCanvas(img, FULL_EDGE, 0.92);
   return {
-    base64: dataUrl.split(",")[1] ?? "",
+    base64: sent.base64,
     mediaType: "image/jpeg",
-    dataUrl,
-    width,
-    height,
+    width: sent.width,
+    height: sent.height,
+    full: { dataUrl: full.dataUrl, width: full.width, height: full.height },
   };
 }
 
 /**
- * Crop a flyer region out of a prepared image and return it as a JPEG data URL.
- * The box is clamped to the image bounds; a tiny pad keeps poster edges intact.
+ * Crop a flyer out of an image and return it as a JPEG data URL. The box is in the
+ * given image's pixel space and is clamped to its bounds, with a small pad to keep
+ * poster edges intact.
  */
 export async function cropToDataUrl(
-  image: PreparedImage,
+  source: { dataUrl: string; width: number; height: number },
   box: Box
 ): Promise<string> {
-  const img = await loadImage(image.dataUrl);
-  const pad = 4;
+  const img = await loadImage(source.dataUrl);
+  const pad = 6;
   const sx = Math.max(0, Math.floor(box.x) - pad);
   const sy = Math.max(0, Math.floor(box.y) - pad);
-  const sw = Math.min(image.width - sx, Math.ceil(box.w) + pad * 2);
-  const sh = Math.min(image.height - sy, Math.ceil(box.h) + pad * 2);
+  const sw = Math.min(source.width - sx, Math.ceil(box.w) + pad * 2);
+  const sh = Math.min(source.height - sy, Math.ceil(box.h) + pad * 2);
   if (sw < 8 || sh < 8) throw new Error("Region too small to crop.");
 
   const canvas = document.createElement("canvas");
@@ -69,7 +86,7 @@ export async function cropToDataUrl(
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Could not crop the image in this browser.");
   ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
-  return canvas.toDataURL("image/jpeg", 0.85);
+  return canvas.toDataURL("image/jpeg", 0.88);
 }
 
 function readAsDataUrl(file: File): Promise<string> {

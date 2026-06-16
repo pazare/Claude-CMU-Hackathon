@@ -7,27 +7,31 @@ interface SettingsDialogProps {
   open: boolean;
   onClose: () => void;
   apiKey: string;
+  openaiKey: string;
   model: ExtractionModelId;
-  onSave: (apiKey: string, model: ExtractionModelId) => void;
+  onSave: (apiKey: string, openaiKey: string, model: ExtractionModelId) => void;
 }
 
 export default function SettingsDialog({
   open,
   onClose,
   apiKey,
+  openaiKey,
   model,
   onSave,
 }: SettingsDialogProps) {
   const [keyDraft, setKeyDraft] = useState(apiKey);
+  const [openaiDraft, setOpenaiDraft] = useState(openaiKey);
   const [modelDraft, setModelDraft] = useState<ExtractionModelId>(model);
 
   // Reset the drafts to current values whenever the dialog opens.
   useEffect(() => {
     if (open) {
       setKeyDraft(apiKey);
+      setOpenaiDraft(openaiKey);
       setModelDraft(model);
     }
-  }, [open, apiKey, model]);
+  }, [open, apiKey, openaiKey, model]);
 
   useEffect(() => {
     if (!open) return;
@@ -74,8 +78,31 @@ export default function SettingsDialog({
               className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cmu-red focus:outline-none focus:ring-1 focus:ring-cmu-red"
             />
             <p className="mt-1 text-xs text-gray-500">
-              Stored only in this browser and sent only to the Anthropic API to
-              read your photos. Get a key at console.anthropic.com.
+              Reads your photos with Claude. Stored only in this browser and
+              sent only to the Anthropic API. Get a key at
+              console.anthropic.com.
+            </p>
+          </div>
+
+          <div>
+            <label
+              htmlFor="openai-key"
+              className="block text-sm font-medium text-gray-700"
+            >
+              OpenAI API key (optional)
+            </label>
+            <input
+              id="openai-key"
+              type="password"
+              value={openaiDraft}
+              onChange={(e) => setOpenaiDraft(e.target.value)}
+              placeholder="sk-..."
+              autoComplete="off"
+              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-cmu-red focus:outline-none focus:ring-1 focus:ring-cmu-red"
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              Lets you recreate a poster on your mural when the photo crop is
+              poor. Stored only in this browser and sent only to the OpenAI API.
             </p>
           </div>
 
@@ -108,12 +135,13 @@ export default function SettingsDialog({
             type="button"
             onClick={() => {
               setKeyDraft("");
-              onSave("", modelDraft);
+              setOpenaiDraft("");
+              onSave("", "", modelDraft);
               onClose();
             }}
             className="text-sm font-medium text-gray-500 hover:text-cmu-red"
           >
-            Clear key
+            Clear keys
           </button>
           <div className="flex gap-2">
             <button
@@ -126,7 +154,7 @@ export default function SettingsDialog({
             <button
               type="button"
               onClick={() => {
-                onSave(keyDraft.trim(), modelDraft);
+                onSave(keyDraft.trim(), openaiDraft.trim(), modelDraft);
                 onClose();
               }}
               className="rounded-lg bg-cmu-red px-4 py-2 text-sm font-semibold text-white hover:bg-red-800"
