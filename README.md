@@ -2,7 +2,7 @@
 
 Photograph one of those crowded poster walls at CMU. Claude reads every flyer on it (events, research studies, jobs, tutoring, things for sale, club sign-ups), and you swipe through them to build your own mural: a board of just the posters that matter to you.
 
-Those opportunities live on physical boards and in scattered newsletters, Slack, and Discord, so students miss most of them. Event Compass turns a single photo into a personalized, swipeable board.
+The problem is access, not eligibility. Opportunities are posted where they happen: a paid research study on the psychology building's wall, a part-time job on the one board outside the hiring department, a club fair in a single hallway. A student in another building never walks past most of them, so matches they could use never reach them. Much of what a campus offers stays out of reach despite a real fit, because the information is physical, local, and scattered across walls no one student sees. Event Compass turns a photo of any wall into structured listings and pools them across buildings, so a flyer in one hall can reach the right student in another.
 
 Built with Claude at the CMU Claude Hackathon in November 2025, and extended with Claude since.
 

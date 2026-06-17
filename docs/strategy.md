@@ -1,10 +1,21 @@
-# Product strategy: from a wall photo to revenue
+# Product strategy: making scattered campus opportunities reachable
 
-This is the plan for turning the prototype into a business. It is written for speed
-to first revenue, for building only what earns, and for a product that one person can
-ship. It is honest about what is defensible and what is not.
+This plan starts from the problem the project exists to solve, then lays out how to reach
+the first users and a path to sustaining the work, building only what earns its place. It
+is honest about what is defensible and what is not.
 
-## The bet
+## The problem
+
+On a campus, opportunities are posted where they happen. A paid research study goes on the
+psychology building's wall. A part-time job goes on the one board outside the hiring
+department. A club fair flyer goes up in a single hallway. A student in another building
+never walks past most of them, so matches they are eligible for and would want never reach
+them. The barrier is not eligibility or interest; it is that the information is physical,
+local, and easy to miss. Much of what a campus offers is therefore systematically out of
+reach: the match exists, but the student and the flyer never meet. Pooling postings across
+buildings, so a flyer in one hall can reach the right student in another, is the point.
+
+## The approach
 
 A student photographs a crowded CMU poster wall. Claude vision splits the photo into
 each separate flyer, reads each one into a structured listing, and the student swipes a
@@ -14,10 +25,10 @@ commoditized niche, now free at the OS level through Apple Visual Intelligence) 
 manual, admin-entered campus feeds. None turn one photo of a whole wall into many
 categorized listings plus a personal feed.
 
-That whitespace is real, but it is not the moat. The bet is that the wall photo is the
-cheapest way to build two assets nobody else has: a current, deduplicated record of what
-is posted across CMU's specific boards, and the relationships with the people who want
-student attention. Those assets are the business. The extraction is how we get them.
+That whitespace is real, but it is not the moat. The wall photo is the cheapest way to
+build two assets nobody else has: a current, deduplicated record of what is posted across
+CMU's specific boards, and the relationships with the people who want student attention.
+Those assets are what sustains the work. The extraction is how we get them.
 
 ## What is defensible, and what is not
 
