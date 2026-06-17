@@ -8,7 +8,7 @@ Built with Claude at the CMU Claude Hackathon in November 2025, and extended wit
 
 **Live demo:** https://pazare.github.io/Claude-CMU-Hackathon/
 **Pitch deck:** https://pazare.github.io/Claude-CMU-Hackathon/pitch.html
-**Product strategy:** [docs/strategy.md](docs/strategy.md)
+**Design notes:** [docs/design-notes.md](docs/design-notes.md)
 
 ![Your personalized mural: real posters cropped from a board photo, pinned and curated by what you saved](docs/screenshot.png)
 
