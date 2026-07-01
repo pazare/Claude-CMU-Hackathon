@@ -1,5 +1,11 @@
 # CMU Event Compass
 
+[![CI](https://github.com/pazare/Claude-CMU-Hackathon/actions/workflows/ci.yml/badge.svg)](https://github.com/pazare/Claude-CMU-Hackathon/actions/workflows/ci.yml)
+
+**Photo of a poster wall → Claude vision extracts structured listings → ranked swipe deck → your saved mural.**
+
+Next.js 14 (App Router), React 18, TypeScript in strict mode, and Tailwind CSS, shipped as a static export with no backend; extraction is a client-side call to the Claude Messages API with a JSON-schema structured output, and the swipe deck is ordered by a deterministic in-browser ranker that scores each flyer on token matches between your chosen interests and its title, summary, and tags.
+
 Photograph one of those crowded poster walls at CMU. Claude reads every flyer on it (events, research studies, jobs, tutoring, things for sale, club sign-ups), and you swipe through them to build your own mural: a board of just the posters that matter to you.
 
 The problem is access, not eligibility. Opportunities are posted where they happen: a paid research study on the psychology building's wall, a part-time job on the one board outside the hiring department, a club fair in a single hallway. A student in another building never walks past most of them, so matches they could use never reach them. Much of what a campus offers stays out of reach despite a real fit, because the information is physical, local, and scattered across walls no one student sees. Event Compass turns a photo of any wall into structured listings and pools them across buildings, so a flyer in one hall can reach the right student in another.
@@ -27,6 +33,22 @@ A secondary **Browse** tab keeps the earlier idea: a filterable, cross-CMU event
 ## How the app uses Claude
 
 The extraction calls the Claude [Messages API](https://docs.claude.com/en/api/messages) directly from the browser. It sends the photo as an image and uses [structured outputs](https://docs.claude.com/en/docs/build-with-claude/structured-outputs) (a JSON schema) so each flyer comes back as a typed object, including the bounding box used for cropping. The default model is Claude Opus 4.8 (`claude-opus-4-8`), with Sonnet 4.6 and Haiku 4.5 as cheaper options in Settings.
+
+One listing, from the built-in sample board (`data/sample-mural.ts`), in the same shape a scan produces; a scan also returns each flyer's bounding box, which becomes the crop:
+
+```json
+{
+  "id": "sample-2",
+  "title": "Paid memory and attention study",
+  "category": "Research",
+  "summary": "Healthy participants needed for a one-hour study on memory and attention. Sessions run weekday afternoons in Baker Hall.",
+  "compensation": "$20 gift card",
+  "contact": "memlab@andrew.cmu.edu",
+  "org": "Psychology Department",
+  "tags": ["psychology", "research study", "paid"],
+  "muralId": "sample"
+}
+```
 
 Because the app is a static site with no backend, it uses your own Anthropic API key. The key is stored only in your browser, sent only to the Anthropic API, and never committed. Get one at [console.anthropic.com](https://console.anthropic.com) and paste it into Settings. The sample board runs without a key.
 
